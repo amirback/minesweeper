@@ -88,6 +88,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   const [board, setBoard] = useState<Board>(initBoard);
   const [status, setStatus] = useState<GameStatus>('idle');
   const [flagsPlaced, setFlagsPlaced] = useState(0);
+  const [flagsUsed, setFlagsUsed] = useState(0);
   const [timer, setTimer] = useState(0);
   const [showProbability, setShowProbability] = useState(false);
   const [probabilities, setProbabilities] = useState<ProbabilityMap>(new Map());
@@ -145,6 +146,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
       setBoard(createEmptyBoard(rows, cols));
       setStatus('idle');
       setFlagsPlaced(0);
+      setFlagsUsed(0);
       setTimer(0);
       setCombo(0);
       setEloGain(null);
@@ -208,11 +210,12 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
       if (flagMode) {
         if (board[row][col].isRevealed) return;
-        if (!board[row][col].isFlagged && flagsPlaced >= MAX_FLAGS) return;
+        if (!board[row][col].isFlagged && flagsUsed >= MAX_FLAGS) return;
         const newBoard = toggleFlag(board, row, col);
         const placing = newBoard[row][col].isFlagged;
         if (placing) {
           sounds.flag();
+          setFlagsUsed(u => u + 1);
           flagEventIdRef.current++;
           setFlagEvent({
             id: flagEventIdRef.current,
@@ -332,18 +335,19 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
       }
       setBoard(newBoard);
     },
-    [board, status, difficulty, flagMode, mode, timer, handleGameEnd, bumpCombo, breakCombo]
+    [board, status, difficulty, flagMode, flagsUsed, mode, timer, handleGameEnd, bumpCombo, breakCombo]
   );
 
   const handleCellRightClick = useCallback(
     (row: number, col: number, clientX = 0, clientY = 0) => {
       if (status === 'won' || status === 'lost') return;
       if (board[row][col].isRevealed) return;
-      if (!board[row][col].isFlagged && flagsPlaced >= MAX_FLAGS) return;
+      if (!board[row][col].isFlagged && flagsUsed >= MAX_FLAGS) return;
       const newBoard = toggleFlag(board, row, col);
       const placing = newBoard[row][col].isFlagged;
       if (placing) {
         sounds.flag();
+        setFlagsUsed(u => u + 1);
         flagEventIdRef.current++;
         setFlagEvent({
           id: flagEventIdRef.current,
@@ -376,6 +380,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     status,
     difficulty,
     flagsPlaced,
+    flagsUsed,
     timer,
     showProbability,
     probabilities,

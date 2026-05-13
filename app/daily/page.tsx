@@ -23,6 +23,7 @@ export default function DailyPage() {
     status,
     difficulty,
     flagsPlaced,
+    flagsUsed,
     timer,
     showProbability,
     probabilities,
@@ -90,6 +91,7 @@ export default function DailyPage() {
             status={status}
             timer={timer}
             flagsPlaced={flagsPlaced}
+            flagsUsed={flagsUsed}
             minesTotal={minesTotal}
             maxFlags={MAX_FLAGS}
             difficulty={difficulty}

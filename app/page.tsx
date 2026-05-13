@@ -21,7 +21,7 @@ type GameAreaProps = {
 
 function GameArea({ userId, onPlayAgain }: GameAreaProps) {
   const {
-    board, status, difficulty, flagsPlaced, timer,
+    board, status, difficulty, flagsPlaced, flagsUsed, timer,
     showProbability, probabilities, flagMode, minesTotal,
     combo, eloGain, flagEvent,
     setFlagMode, resetGame, handleCellClick, handleCellRightClick, toggleProbability,
@@ -31,7 +31,7 @@ function GameArea({ userId, onPlayAgain }: GameAreaProps) {
     <>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, flex: '1 1 400px', minWidth: 0 }}>
         <GameHeader
-          status={status} timer={timer} flagsPlaced={flagsPlaced} minesTotal={minesTotal}
+          status={status} timer={timer} flagsPlaced={flagsPlaced} flagsUsed={flagsUsed} minesTotal={minesTotal}
           maxFlags={MAX_FLAGS} difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
           onReset={() => resetGame()}
           onDifficultyChange={(d: Difficulty) => resetGame(d)}

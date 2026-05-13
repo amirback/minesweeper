@@ -9,6 +9,7 @@ type GameHeaderProps = {
   status: GameStatus;
   timer: number;
   flagsPlaced: number;
+  flagsUsed: number;
   minesTotal: number;
   maxFlags: number;
   difficulty: Difficulty;
@@ -32,6 +33,7 @@ export function GameHeader({
   status,
   timer,
   flagsPlaced,
+  flagsUsed,
   minesTotal,
   maxFlags,
   difficulty,
@@ -44,7 +46,7 @@ export function GameHeader({
   onToggleFlagMode,
 }: GameHeaderProps) {
   const remaining = Math.max(0, minesTotal - flagsPlaced);
-  const flagsLeft = maxFlags - flagsPlaced;
+  const flagsLeft = maxFlags - flagsUsed;
   const flagsExhausted = flagsLeft <= 0;
 
   return (
