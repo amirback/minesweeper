@@ -7,6 +7,7 @@ import { Board } from '@/components/game/Board';
 import { GameHeader } from '@/components/game/GameHeader';
 import { GameOverlay } from '@/components/game/GameOverlay';
 import { ComboDisplay } from '@/components/game/ComboDisplay';
+import { Soldier } from '@/components/Soldier';
 import { NavBar } from '@/components/NavBar';
 import { AuthModal } from '@/components/AuthModal';
 import { LiveFeed } from '@/components/LiveFeed';
@@ -20,7 +21,7 @@ export default function HomePage() {
   const {
     board, status, difficulty, flagsPlaced, timer,
     showProbability, probabilities, flagMode, minesTotal,
-    combo, eloGain,
+    combo, eloGain, flagEvent,
     setFlagMode, resetGame, handleCellClick, handleCellRightClick, toggleProbability,
   } = useGame('easy', { userId: user?.id });
 
@@ -94,6 +95,7 @@ export default function HomePage() {
       </main>
 
       <ComboDisplay combo={combo} />
+      <Soldier event={flagEvent} />
 
       <GameOverlay
         status={status} timer={timer} difficulty={difficulty}

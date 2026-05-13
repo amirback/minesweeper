@@ -20,7 +20,7 @@ type CellProps = {
   probability?: number;
   showProbability: boolean;
   onClick: (row: number, col: number) => void;
-  onRightClick: (row: number, col: number) => void;
+  onRightClick: (row: number, col: number, clientX: number, clientY: number) => void;
   cellSize: number;
   isExploded?: boolean;
 };
@@ -36,7 +36,7 @@ export function Cell({
 }: CellProps) {
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    onRightClick(cell.row, cell.col);
+    onRightClick(cell.row, cell.col, e.clientX, e.clientY);
   };
 
   const emojiSize = cellSize * 0.52;

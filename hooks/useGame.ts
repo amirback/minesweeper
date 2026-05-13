@@ -94,6 +94,8 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   const [dailyCompleted, setDailyCompleted] = useState(false);
   const [combo, setCombo] = useState(0);
   const [eloGain, setEloGain] = useState<number | null>(null);
+  const [flagEvent, setFlagEvent] = useState<{ id: number; x: number; y: number; isMine: boolean; gameActive: boolean } | null>(null);
+  const flagEventIdRef = useRef(0);
 
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -320,14 +322,26 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   );
 
   const handleCellRightClick = useCallback(
-    (row: number, col: number) => {
+    (row: number, col: number, clientX = 0, clientY = 0) => {
       if (status === 'won' || status === 'lost') return;
       if (board[row][col].isRevealed) return;
       const newBoard = toggleFlag(board, row, col);
-      const delta = newBoard[row][col].isFlagged ? 1 : -1;
-      if (delta > 0) sounds.flag(); else sounds.click();
+      const placing = newBoard[row][col].isFlagged;
+      if (placing) {
+        sounds.flag();
+        flagEventIdRef.current++;
+        setFlagEvent({
+          id: flagEventIdRef.current,
+          x: clientX,
+          y: clientY,
+          isMine: board[row][col].isMine,
+          gameActive: status === 'playing',
+        });
+      } else {
+        sounds.click();
+      }
       setBoard(newBoard);
-      setFlagsPlaced(f => f + delta);
+      setFlagsPlaced(f => f + (placing ? 1 : -1));
     },
     [board, status]
   );
@@ -355,6 +369,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     dailyCompleted,
     combo,
     eloGain,
+    flagEvent,
     setFlagMode,
     resetGame,
     handleCellClick,

@@ -10,7 +10,7 @@ type BoardProps = {
   probabilities: ProbabilityMap;
   showProbability: boolean;
   onCellClick: (row: number, col: number) => void;
-  onCellRightClick: (row: number, col: number) => void;
+  onCellRightClick: (row: number, col: number, clientX: number, clientY: number) => void;
   shake?: boolean;
 };
 
