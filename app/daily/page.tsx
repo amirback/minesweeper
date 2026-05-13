@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useGame } from '@/hooks/useGame';
+import { useGame, MAX_FLAGS } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
 import { Board } from '@/components/game/Board';
 import { GameHeader } from '@/components/game/GameHeader';
@@ -91,6 +91,7 @@ export default function DailyPage() {
             timer={timer}
             flagsPlaced={flagsPlaced}
             minesTotal={minesTotal}
+            maxFlags={MAX_FLAGS}
             difficulty={difficulty}
             showProbability={showProbability}
             flagMode={flagMode}

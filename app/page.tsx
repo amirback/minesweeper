@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGame } from '@/hooks/useGame';
+import { useGame, MAX_FLAGS } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
 import { Board } from '@/components/game/Board';
 import { GameHeader } from '@/components/game/GameHeader';
@@ -32,7 +32,7 @@ function GameArea({ userId, onPlayAgain }: GameAreaProps) {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, flex: '1 1 400px', minWidth: 0 }}>
         <GameHeader
           status={status} timer={timer} flagsPlaced={flagsPlaced} minesTotal={minesTotal}
-          difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
+          maxFlags={MAX_FLAGS} difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
           onReset={() => resetGame()}
           onDifficultyChange={(d: Difficulty) => resetGame(d)}
           onToggleProbability={toggleProbability}

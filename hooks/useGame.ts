@@ -66,6 +66,7 @@ type UseGameOptions = {
 };
 
 const COMBO_WINDOW_MS = 3000;
+const MAX_FLAGS = 10;
 
 export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGameOptions = {}) {
   const { mode = 'normal', userId } = options;
@@ -207,6 +208,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
       if (flagMode) {
         if (board[row][col].isRevealed) return;
+        if (!board[row][col].isFlagged && flagsPlaced >= MAX_FLAGS) return;
         const newBoard = toggleFlag(board, row, col);
         const placing = newBoard[row][col].isFlagged;
         if (placing) {
@@ -337,6 +339,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     (row: number, col: number, clientX = 0, clientY = 0) => {
       if (status === 'won' || status === 'lost') return;
       if (board[row][col].isRevealed) return;
+      if (!board[row][col].isFlagged && flagsPlaced >= MAX_FLAGS) return;
       const newBoard = toggleFlag(board, row, col);
       const placing = newBoard[row][col].isFlagged;
       if (placing) {
@@ -390,4 +393,4 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   };
 }
 
-export { loadStats };
+export { loadStats, MAX_FLAGS };

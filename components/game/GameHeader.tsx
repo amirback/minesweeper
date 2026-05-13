@@ -10,6 +10,7 @@ type GameHeaderProps = {
   timer: number;
   flagsPlaced: number;
   minesTotal: number;
+  maxFlags: number;
   difficulty: Difficulty;
   showProbability: boolean;
   flagMode: boolean;
@@ -32,6 +33,7 @@ export function GameHeader({
   timer,
   flagsPlaced,
   minesTotal,
+  maxFlags,
   difficulty,
   showProbability,
   flagMode,
@@ -42,6 +44,8 @@ export function GameHeader({
   onToggleFlagMode,
 }: GameHeaderProps) {
   const remaining = Math.max(0, minesTotal - flagsPlaced);
+  const flagsLeft = maxFlags - flagsPlaced;
+  const flagsExhausted = flagsLeft <= 0;
 
   return (
     <div className="w-full flex flex-col gap-2">
@@ -150,17 +154,17 @@ export function GameHeader({
             fontSize: 12,
             fontWeight: 600,
             border: 'none',
-            cursor: 'pointer',
-            background: flagMode ? '#dc2626' : '#1e2235',
-            color: flagMode ? '#fff' : '#94a3b8',
+            cursor: flagsExhausted ? 'not-allowed' : 'pointer',
+            background: flagsExhausted ? '#2a1a1a' : flagMode ? '#dc2626' : '#1e2235',
+            color: flagsExhausted ? '#6b2626' : flagMode ? '#fff' : '#94a3b8',
             display: 'flex',
             alignItems: 'center',
             gap: 4,
             transition: 'all 0.15s',
           }}
-          title="Toggle flag mode (mobile)"
+          title={flagsExhausted ? 'No flags left this game' : 'Toggle flag mode (mobile)'}
         >
-          🚩 Flag Mode {flagMode ? 'ON' : 'OFF'}
+          🚩 {flagsLeft}/{maxFlags} {flagMode ? 'ON' : 'OFF'}
         </button>
       </div>
     </div>
