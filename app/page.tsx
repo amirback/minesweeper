@@ -14,16 +14,63 @@ import { LiveFeed } from '@/components/LiveFeed';
 import { StatsPanel } from '@/components/StatsPanel';
 import type { Difficulty } from '@/types/game';
 
-export default function HomePage() {
-  const { user, loading, signOut, signInWithEmail, signUpWithEmail } = useAuth();
-  const [authOpen, setAuthOpen] = useState(false);
+type GameAreaProps = {
+  userId?: string;
+  onPlayAgain: () => void;
+};
 
+function GameArea({ userId, onPlayAgain }: GameAreaProps) {
   const {
     board, status, difficulty, flagsPlaced, timer,
     showProbability, probabilities, flagMode, minesTotal,
     combo, eloGain, flagEvent,
     setFlagMode, resetGame, handleCellClick, handleCellRightClick, toggleProbability,
-  } = useGame('easy', { userId: user?.id });
+  } = useGame('easy', { userId });
+
+  return (
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, flex: '1 1 400px', minWidth: 0 }}>
+        <GameHeader
+          status={status} timer={timer} flagsPlaced={flagsPlaced} minesTotal={minesTotal}
+          difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
+          onReset={() => resetGame()}
+          onDifficultyChange={(d: Difficulty) => resetGame(d)}
+          onToggleProbability={toggleProbability}
+          onToggleFlagMode={() => setFlagMode(f => !f)}
+        />
+        <Board
+          board={board} probabilities={probabilities} showProbability={showProbability}
+          onCellClick={handleCellClick} onCellRightClick={handleCellRightClick}
+          shake={status === 'lost'}
+        />
+        {showProbability && (
+          <div style={{
+            background: '#151728', border: '1px solid #1e2235', borderRadius: 8,
+            padding: '8px 12px', fontSize: 12, color: '#64748b', maxWidth: 380, textAlign: 'center',
+          }}>
+            🤖 <strong style={{ color: '#818cf8' }}>AI Coach</strong> — mine probability from adjacent constraints.
+            <span style={{ color: '#4ade80' }}> Green = safer</span>,{' '}
+            <span style={{ color: '#f87171' }}>red = dangerous</span>.
+          </div>
+        )}
+      </div>
+
+      <ComboDisplay combo={combo} />
+      <Soldier event={flagEvent} />
+
+      <GameOverlay
+        status={status} timer={timer} difficulty={difficulty}
+        eloGain={eloGain} combo={combo}
+        onPlayAgain={onPlayAgain}
+      />
+    </>
+  );
+}
+
+export default function HomePage() {
+  const { user, loading, signOut, signInWithEmail, signUpWithEmail } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [gameKey, setGameKey] = useState(0);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -51,38 +98,16 @@ export default function HomePage() {
           display: 'flex', gap: 20, alignItems: 'flex-start',
           flexWrap: 'wrap', justifyContent: 'center',
         }}>
-          {/* Game column */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, flex: '1 1 400px', minWidth: 0 }}>
-            <GameHeader
-              status={status} timer={timer} flagsPlaced={flagsPlaced} minesTotal={minesTotal}
-              difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
-              onReset={() => resetGame()}
-              onDifficultyChange={(d: Difficulty) => resetGame(d)}
-              onToggleProbability={toggleProbability}
-              onToggleFlagMode={() => setFlagMode(f => !f)}
-            />
-            <Board
-              board={board} probabilities={probabilities} showProbability={showProbability}
-              onCellClick={handleCellClick} onCellRightClick={handleCellRightClick}
-              shake={status === 'lost'}
-            />
-            {showProbability && (
-              <div style={{
-                background: '#151728', border: '1px solid #1e2235', borderRadius: 8,
-                padding: '8px 12px', fontSize: 12, color: '#64748b', maxWidth: 380, textAlign: 'center',
-              }}>
-                🤖 <strong style={{ color: '#818cf8' }}>AI Coach</strong> — mine probability from adjacent constraints.
-                <span style={{ color: '#4ade80' }}> Green = safer</span>,{' '}
-                <span style={{ color: '#f87171' }}>red = dangerous</span>.
-              </div>
-            )}
-          </div>
+          <GameArea
+            key={gameKey}
+            userId={user?.id}
+            onPlayAgain={() => setGameKey(k => k + 1)}
+          />
 
           {/* Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: 280, flexShrink: 0 }}>
             <StatsPanel />
 
-            {/* Live feed */}
             <div style={{ background: '#151728', border: '1px solid #1e2235', borderRadius: 12, padding: 14 }}>
               <h3 style={{ color: '#e2e8f0', fontWeight: 700, fontSize: 14, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', display: 'inline-block', boxShadow: '0 0 6px #4ade80' }} />
@@ -93,15 +118,6 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-
-      <ComboDisplay combo={combo} />
-      <Soldier event={flagEvent} />
-
-      <GameOverlay
-        status={status} timer={timer} difficulty={difficulty}
-        eloGain={eloGain} combo={combo}
-        onPlayAgain={() => resetGame()}
-      />
 
       {authOpen && (
         <AuthModal
