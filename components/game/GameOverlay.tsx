@@ -116,7 +116,7 @@ export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGai
           <p style={{ color: '#fbbf24', fontSize: 13, marginBottom: 16 }}>⭐ Daily Challenge Complete!</p>
         )}
 
-        {mode !== 'daily' && (
+        {(mode !== 'daily' || !won) && (
           <button onClick={onPlayAgain}
             style={{
               background: won ? '#4f46e5' : '#1e2235', color: '#fff', border: 'none',
@@ -129,7 +129,7 @@ export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGai
           </button>
         )}
 
-        {mode === 'daily' && (
+        {mode === 'daily' && won && (
           <p style={{ color: '#475569', fontSize: 12, marginTop: 8 }}>New board tomorrow!</p>
         )}
       </div>

@@ -29,6 +29,7 @@ export default function DailyPage() {
     flagMode,
     minesTotal,
     dailyCompleted,
+    eloGain,
     setFlagMode,
     resetGame,
     handleCellClick,
@@ -146,7 +147,8 @@ export default function DailyPage() {
         timer={timer}
         difficulty={difficulty}
         mode="daily"
-        onPlayAgain={() => {}}
+        eloGain={eloGain}
+        onPlayAgain={() => resetGame()}
       />
 
       {authOpen && (
