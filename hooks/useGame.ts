@@ -202,16 +202,28 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   );
 
   const handleCellClick = useCallback(
-    (row: number, col: number) => {
+    (row: number, col: number, clientX?: number, clientY?: number) => {
       if (status === 'won' || status === 'lost') return;
 
       if (flagMode) {
         if (board[row][col].isRevealed) return;
         const newBoard = toggleFlag(board, row, col);
-        const delta = newBoard[row][col].isFlagged ? 1 : -1;
-        if (delta > 0) sounds.flag(); else sounds.click();
+        const placing = newBoard[row][col].isFlagged;
+        if (placing) {
+          sounds.flag();
+          flagEventIdRef.current++;
+          setFlagEvent({
+            id: flagEventIdRef.current,
+            x: clientX ?? window.innerWidth / 2,
+            y: clientY ?? window.innerHeight / 2,
+            isMine: board[row][col].isMine,
+            gameActive: status === 'playing',
+          });
+        } else {
+          sounds.click();
+        }
         setBoard(newBoard);
-        setFlagsPlaced(f => f + delta);
+        setFlagsPlaced(f => f + (placing ? 1 : -1));
         return;
       }
 

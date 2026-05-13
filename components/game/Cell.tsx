@@ -19,7 +19,7 @@ type CellProps = {
   cell: CellType;
   probability?: number;
   showProbability: boolean;
-  onClick: (row: number, col: number) => void;
+  onClick: (row: number, col: number, clientX: number, clientY: number) => void;
   onRightClick: (row: number, col: number, clientX: number, clientY: number) => void;
   cellSize: number;
   isExploded?: boolean;
@@ -116,7 +116,7 @@ export function Cell({
         transition: 'background-color 0.08s',
         WebkitTapHighlightColor: 'transparent',
       }}
-      onClick={() => onClick(cell.row, cell.col)}
+      onClick={e => onClick(cell.row, cell.col, e.clientX, e.clientY)}
       onContextMenu={handleRightClick}
       aria-label={`r${cell.row}c${cell.col}`}
     >
