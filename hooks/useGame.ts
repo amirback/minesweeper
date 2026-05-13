@@ -16,11 +16,56 @@ import {
 } from '@/lib/minesweeper';
 import { calculateProbabilities, type ProbabilityMap } from '@/lib/probability';
 import { saveGameResult } from '@/lib/supabase';
+import { calcEloGain } from '@/lib/elo';
+import { sounds } from '@/lib/sounds';
+
+// Local stats stored in localStorage
+export type LocalStats = {
+  totalGames: number;
+  wins: number;
+  totalClicks: number;
+  mineHits: number;
+  totalTime: number;
+  byDifficulty: Record<Difficulty, { games: number; wins: number; bestTime: number }>;
+};
+
+const STATS_KEY = 'minetrainer_stats';
+
+function loadStats(): LocalStats {
+  if (typeof window === 'undefined') return emptyStats();
+  try {
+    return JSON.parse(localStorage.getItem(STATS_KEY) ?? '') as LocalStats;
+  } catch {
+    return emptyStats();
+  }
+}
+
+function emptyStats(): LocalStats {
+  return {
+    totalGames: 0,
+    wins: 0,
+    totalClicks: 0,
+    mineHits: 0,
+    totalTime: 0,
+    byDifficulty: {
+      easy:   { games: 0, wins: 0, bestTime: 0 },
+      medium: { games: 0, wins: 0, bestTime: 0 },
+      hard:   { games: 0, wins: 0, bestTime: 0 },
+    },
+  };
+}
+
+function saveStats(stats: LocalStats) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+}
 
 type UseGameOptions = {
   mode?: 'normal' | 'daily';
   userId?: string;
 };
+
+const COMBO_WINDOW_MS = 3000;
 
 export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGameOptions = {}) {
   const { mode = 'normal', userId } = options;
@@ -47,9 +92,13 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   const [probabilities, setProbabilities] = useState<ProbabilityMap>(new Map());
   const [flagMode, setFlagMode] = useState(false);
   const [dailyCompleted, setDailyCompleted] = useState(false);
+  const [combo, setCombo] = useState(0);
+  const [eloGain, setEloGain] = useState<number | null>(null);
 
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastSafeClickRef = useRef<number>(0);
+  const comboRef = useRef(0);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -61,16 +110,29 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     } else {
       if (timerRef.current) clearInterval(timerRef.current);
     }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [status]);
 
   useEffect(() => {
-    if (showProbability) {
-      setProbabilities(calculateProbabilities(board));
-    }
+    if (showProbability) setProbabilities(calculateProbabilities(board));
   }, [board, showProbability]);
+
+  const bumpCombo = useCallback(() => {
+    const now = Date.now();
+    const elapsed = now - lastSafeClickRef.current;
+    const newCombo = elapsed <= COMBO_WINDOW_MS ? comboRef.current + 1 : 1;
+    comboRef.current = newCombo;
+    lastSafeClickRef.current = now;
+    setCombo(newCombo);
+    sounds.combo(newCombo);
+  }, []);
+
+  const breakCombo = useCallback(() => {
+    if (comboRef.current > 1) sounds.comboBreak();
+    comboRef.current = 0;
+    lastSafeClickRef.current = 0;
+    setCombo(0);
+  }, []);
 
   const resetGame = useCallback(
     (newDifficulty?: Difficulty) => {
@@ -81,14 +143,35 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
       setStatus('idle');
       setFlagsPlaced(0);
       setTimer(0);
+      setCombo(0);
+      setEloGain(null);
       startTimeRef.current = null;
+      comboRef.current = 0;
+      lastSafeClickRef.current = 0;
       setProbabilities(new Map());
     },
     [difficulty, mode]
   );
 
   const handleGameEnd = useCallback(
-    async (won: boolean, finalTimer: number, currentBoard: Board) => {
+    async (won: boolean, finalTimer: number) => {
+      // Local stats
+      const stats = loadStats();
+      stats.totalGames++;
+      if (won) stats.wins++;
+      stats.totalTime += finalTimer;
+      stats.byDifficulty[difficulty].games++;
+      if (won) {
+        stats.byDifficulty[difficulty].wins++;
+        const best = stats.byDifficulty[difficulty].bestTime;
+        if (!best || finalTimer < best) stats.byDifficulty[difficulty].bestTime = finalTimer;
+      }
+      saveStats(stats);
+
+      // ELO
+      const gain = calcEloGain(difficulty, won, finalTimer);
+      setEloGain(gain);
+
       if (mode === 'daily' && won) {
         setDailyCompleted(true);
         if (userId) {
@@ -99,15 +182,17 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
             won: true,
             is_daily: true,
             daily_date: getDailyDateString(),
+            elo_delta: gain,
           });
         }
-      } else if (won && userId) {
+      } else if (userId) {
         await saveGameResult({
           user_id: userId,
           difficulty,
           time_seconds: finalTimer,
-          won: true,
+          won,
           is_daily: false,
+          elo_delta: gain,
         });
       }
     },
@@ -122,6 +207,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
         if (board[row][col].isRevealed) return;
         const newBoard = toggleFlag(board, row, col);
         const delta = newBoard[row][col].isFlagged ? 1 : -1;
+        if (delta > 0) sounds.flag(); else sounds.click();
         setBoard(newBoard);
         setFlagsPlaced(f => f + delta);
         return;
@@ -132,10 +218,8 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
       if (status === 'idle') {
         if (mode === 'daily') {
-          // Daily board already has mines placed
           setStatus('playing');
           startTimeRef.current = Date.now();
-          // If first click is on a mine in daily mode, just start - no safe zone
         } else {
           currentBoard = placeMines(board, rows, cols, mines, row, col);
           setStatus('playing');
@@ -143,7 +227,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
         }
       }
 
-      // Chord reveal: clicking a revealed number
+      // Chord reveal on already-revealed number
       if (currentBoard[row][col].isRevealed) {
         const cell = currentBoard[row][col];
         if (cell.neighborCount === 0) return;
@@ -165,8 +249,15 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
         const hitMine = unrevealed.some(([nr, nc]) => currentBoard[nr][nc].isMine);
         if (hitMine) {
+          sounds.explosion();
+          breakCombo();
+          const stats = loadStats();
+          stats.totalClicks++;
+          stats.mineHits++;
+          saveStats(stats);
           setBoard(revealAllMines(currentBoard));
           setStatus('lost');
+          handleGameEnd(false, timer);
           return;
         }
 
@@ -174,11 +265,19 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
         for (const [nr, nc] of unrevealed) {
           afterChord = revealCell(afterChord, nr, nc, rows, cols);
         }
+        sounds.cascade();
+        bumpCombo();
+
+        const stats = loadStats();
+        stats.totalClicks++;
+        saveStats(stats);
 
         if (checkWin(afterChord)) {
           setBoard(afterChord);
           setStatus('won');
-          handleGameEnd(true, timer, afterChord);
+          sounds.victory();
+          breakCombo();
+          handleGameEnd(true, timer);
           return;
         }
         setBoard(afterChord);
@@ -187,23 +286,37 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
       if (currentBoard[row][col].isFlagged) return;
 
+      // Update click stats
+      const stats = loadStats();
+      stats.totalClicks++;
+
       if (currentBoard[row][col].isMine) {
-        const revealedBoard = revealAllMines(currentBoard);
-        setBoard(revealedBoard);
+        stats.mineHits++;
+        saveStats(stats);
+        sounds.explosion();
+        breakCombo();
+        setBoard(revealAllMines(currentBoard));
         setStatus('lost');
+        handleGameEnd(false, timer);
         return;
       }
+      saveStats(stats);
 
       const newBoard = revealCell(currentBoard, row, col, rows, cols);
+      sounds.click();
+      bumpCombo();
+
       if (checkWin(newBoard)) {
         setBoard(newBoard);
         setStatus('won');
-        handleGameEnd(true, timer, newBoard);
+        sounds.victory();
+        breakCombo();
+        handleGameEnd(true, timer);
         return;
       }
       setBoard(newBoard);
     },
-    [board, status, difficulty, flagMode, mode, timer, handleGameEnd]
+    [board, status, difficulty, flagMode, mode, timer, handleGameEnd, bumpCombo, breakCombo]
   );
 
   const handleCellRightClick = useCallback(
@@ -212,6 +325,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
       if (board[row][col].isRevealed) return;
       const newBoard = toggleFlag(board, row, col);
       const delta = newBoard[row][col].isFlagged ? 1 : -1;
+      if (delta > 0) sounds.flag(); else sounds.click();
       setBoard(newBoard);
       setFlagsPlaced(f => f + delta);
     },
@@ -239,6 +353,8 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     flagMode,
     minesTotal,
     dailyCompleted,
+    combo,
+    eloGain,
     setFlagMode,
     resetGame,
     handleCellClick,
@@ -246,3 +362,5 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     toggleProbability,
   };
 }
+
+export { loadStats };
