@@ -21,10 +21,10 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse 900px 700px at 15% 25%, rgba(34,197,94,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 700px 900px at 85% 75%, rgba(34,197,94,0.04) 0%, transparent 60%);
+  background-color: #3c5828;
+  background-image: url('/puzzle.svg');
+  background-size: 200px 200px;
+  background-repeat: repeat;
   color: var(--text);
   font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100%;

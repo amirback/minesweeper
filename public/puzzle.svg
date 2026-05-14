@@ -1,11 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
-  <rect width="200" height="200" fill="#b8dc82"/>
-  <rect x="4" y="4" width="92" height="92" rx="7" fill="#74ba28"/>
-  <rect x="104" y="4" width="92" height="92" rx="7" fill="#f2fce6"/>
-  <rect x="4" y="104" width="92" height="92" rx="7" fill="#f2fce6"/>
-  <rect x="104" y="104" width="92" height="92" rx="7" fill="#74ba28"/>
-  <circle cx="100" cy="50" r="14" fill="#74ba28"/>
-  <circle cx="50" cy="100" r="14" fill="#74ba28"/>
-  <circle cx="150" cy="100" r="14" fill="#f2fce6"/>
-  <circle cx="100" cy="150" r="14" fill="#f2fce6"/>
+  <!-- Piece A: dark, top-left -->
+  <rect x="0" y="0" width="100" height="100" fill="#3c5828"/>
+  <!-- Piece D: dark, bottom-right -->
+  <rect x="100" y="100" width="100" height="100" fill="#3c5828"/>
+  <!-- Piece B: light, top-right -->
+  <rect x="100" y="0" width="100" height="100" fill="#7e9a52"/>
+  <!-- Piece C: light, bottom-left -->
+  <rect x="0" y="100" width="100" height="100" fill="#7e9a52"/>
+
+  <!-- Internal tabs (full circles at internal boundaries) -->
+  <circle cx="100" cy="50"  r="15" fill="#3c5828"/>
+  <circle cx="50"  cy="100" r="15" fill="#3c5828"/>
+  <circle cx="150" cy="100" r="15" fill="#7e9a52"/>
+  <circle cx="100" cy="150" r="15" fill="#7e9a52"/>
+
+  <!-- Edge half-circles for seamless cross-tile interlocking -->
+  <circle cx="0"   cy="50"  r="15" fill="#7e9a52"/>
+  <circle cx="0"   cy="150" r="15" fill="#3c5828"/>
+  <circle cx="200" cy="50"  r="15" fill="#7e9a52"/>
+  <circle cx="200" cy="150" r="15" fill="#3c5828"/>
+  <circle cx="50"  cy="0"   r="15" fill="#7e9a52"/>
+  <circle cx="150" cy="0"   r="15" fill="#3c5828"/>
+  <circle cx="50"  cy="200" r="15" fill="#7e9a52"/>
+  <circle cx="150" cy="200" r="15" fill="#3c5828"/>
 </svg>
