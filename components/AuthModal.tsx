@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 type AuthModalProps = {
   onClose: () => void;
@@ -21,30 +22,54 @@ function passwordStrength(p: string): { score: number; label: string; color: str
   return               { score: 3, label: 'Средний',      color: '#d4b040' };
 }
 
-export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
-  const [tab, setTab]           = useState<'signin' | 'signup'>('signin');
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [success, setSuccess]   = useState('');
+type Mode = 'signin' | 'signup' | 'reset';
 
-  const strength = tab === 'signup' ? passwordStrength(password) : null;
+export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
+  const [mode, setMode]          = useState<Mode>('signin');
+  const [email, setEmail]        = useState('');
+  const [password, setPassword]  = useState('');
+  const [username, setUsername]  = useState('');
+  const [error, setError]        = useState('');
+  const [loading, setLoading]    = useState(false);
+  const [success, setSuccess]    = useState('');
+
+  const strength = mode === 'signup' ? passwordStrength(password) : null;
+
+  const switchMode = (m: Mode) => { setMode(m); setError(''); setSuccess(''); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (tab === 'signup') {
+    if (mode === 'signup') {
       if (!username.trim()) { setError('Введите никнейм'); return; }
       if (password.length < 8) { setError('Пароль минимум 8 символов'); return; }
       if (strength && strength.score < 3) { setError('Пароль слишком слабый — добавьте цифры или заглавные буквы'); return; }
     }
 
+    if (mode === 'reset') {
+      if (!email) { setError('Введите email'); return; }
+      if (!supabase) { setError('Supabase не настроен'); return; }
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: typeof window !== 'undefined'
+            ? `${window.location.origin}/settings`
+            : '/settings',
+        });
+        if (error) throw error;
+        setSuccess('Ссылка для сброса пароля отправлена — проверьте почту');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Ошибка отправки');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     setLoading(true);
     try {
-      if (tab === 'signin') {
+      if (mode === 'signin') {
         const { error } = await onSignIn(email, password);
         if (error) throw error;
         onClose();
@@ -79,22 +104,25 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
           <div style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", fontSize: 28, letterSpacing: 4, color: 'var(--green-hi)' }}>
             SAPER
           </div>
-          <div style={{ color: 'var(--text-2)', fontSize: 12, letterSpacing: 1 }}>ВОЙТИ / ЗАРЕГИСТРИРОВАТЬСЯ</div>
+          <div style={{ color: 'var(--text-2)', fontSize: 12, letterSpacing: 1 }}>
+            {mode === 'reset' ? 'ВОССТАНОВЛЕНИЕ ПАРОЛЯ' : 'ВОЙТИ / ЗАРЕГИСТРИРОВАТЬСЯ'}
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', background: 'var(--bg)', borderRadius: 4, padding: 3, marginBottom: 18, gap: 3 }}>
-          {(['signin', 'signup'] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setError(''); setSuccess(''); }}
-              style={{ flex: 1, padding: '7px', borderRadius: 3, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 800, letterSpacing: 1,
-                background: tab === t ? 'var(--green)' : 'transparent',
-                color: tab === t ? '#fff' : 'var(--text-dim)',
-                transition: 'all 0.15s',
-              }}>
-              {t === 'signin' ? 'ВОЙТИ' : 'РЕГИСТРАЦИЯ'}
-            </button>
-          ))}
-        </div>
+        {mode !== 'reset' && (
+          <div style={{ display: 'flex', background: 'var(--bg)', borderRadius: 4, padding: 3, marginBottom: 18, gap: 3 }}>
+            {(['signin', 'signup'] as const).map(t => (
+              <button key={t} onClick={() => switchMode(t)}
+                style={{ flex: 1, padding: '7px', borderRadius: 3, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 800, letterSpacing: 1,
+                  background: mode === t ? 'var(--green)' : 'transparent',
+                  color: mode === t ? '#fff' : 'var(--text-dim)',
+                  transition: 'all 0.15s',
+                }}>
+                {t === 'signin' ? 'ВОЙТИ' : 'РЕГИСТРАЦИЯ'}
+              </button>
+            ))}
+          </div>
+        )}
 
         {success ? (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
@@ -106,23 +134,26 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {tab === 'signup' && (
+            {mode === 'signup' && (
               <input type="text" placeholder="Никнейм" value={username} onChange={e => setUsername(e.target.value)} style={inp} autoComplete="username" maxLength={20} />
             )}
             <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required style={inp} autoComplete="email" />
-            <div>
-              <input type="password" placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} required style={inp} autoComplete={tab === 'signin' ? 'current-password' : 'new-password'} minLength={tab === 'signup' ? 8 : 1} />
-              {tab === 'signup' && strength && strength.label && (
-                <div style={{ marginTop: 5 }}>
-                  <div style={{ display: 'flex', gap: 3, marginBottom: 3 }}>
-                    {[1,2,3,4,5].map(i => (
-                      <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= strength.score ? strength.color : 'var(--border)' }}/>
-                    ))}
+
+            {mode !== 'reset' && (
+              <div>
+                <input type="password" placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} required style={inp} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} minLength={mode === 'signup' ? 8 : 1} />
+                {mode === 'signup' && strength && strength.label && (
+                  <div style={{ marginTop: 5 }}>
+                    <div style={{ display: 'flex', gap: 3, marginBottom: 3 }}>
+                      {[1,2,3,4,5].map(i => (
+                        <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= strength.score ? strength.color : 'var(--border)' }}/>
+                      ))}
+                    </div>
+                    <span style={{ fontSize: 11, color: strength.color }}>{strength.label}</span>
                   </div>
-                  <span style={{ fontSize: 11, color: strength.color }}>{strength.label}</span>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {error && (
               <div style={{ background: 'rgba(224,68,34,0.15)', border: '1px solid var(--danger)', borderRadius: 4, padding: '8px 12px', fontSize: 13, color: '#ff9977', textAlign: 'center' }}>
@@ -137,8 +168,19 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
               letterSpacing: 1, fontFamily: "'Bebas Neue', Impact, sans-serif",
               marginTop: 4, transition: 'opacity 0.15s',
             }}>
-              {loading ? 'ЗАГРУЗКА...' : tab === 'signin' ? 'ВОЙТИ' : 'СОЗДАТЬ АККАУНТ'}
+              {loading ? 'ЗАГРУЗКА...' : mode === 'signin' ? 'ВОЙТИ' : mode === 'signup' ? 'СОЗДАТЬ АККАУНТ' : 'ОТПРАВИТЬ ССЫЛКУ'}
             </button>
+
+            {mode === 'signin' && (
+              <button type="button" onClick={() => switchMode('reset')} style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: 12, cursor: 'pointer', textAlign: 'center', marginTop: 2 }}>
+                Забыли пароль?
+              </button>
+            )}
+            {mode === 'reset' && (
+              <button type="button" onClick={() => switchMode('signin')} style={{ background: 'transparent', border: 'none', color: 'var(--text-dim)', fontSize: 12, cursor: 'pointer', textAlign: 'center', marginTop: 2 }}>
+                ← Назад к входу
+              </button>
+            )}
           </form>
         )}
 

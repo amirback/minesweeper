@@ -1,10 +1,37 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import type { Difficulty, GameStatus } from '@/types/game';
 import { DIFFICULTY_CONFIG } from '@/types/game';
 import { formatTime } from '@/lib/minesweeper';
 import { getRank } from '@/lib/elo';
+
+function getSecondsUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  return Math.floor((midnight.getTime() - now.getTime()) / 1000);
+}
+
+function DailyCountdown() {
+  const [secs, setSecs] = useState(getSecondsUntilMidnight);
+  useEffect(() => {
+    const t = setInterval(() => setSecs(getSecondsUntilMidnight()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const fmt = (n: number) => String(n).padStart(2, '0');
+  return (
+    <div style={{ color: 'var(--text-dim)', fontSize: 12, marginBottom: 12 }}>
+      Следующая карта через:{' '}
+      <span style={{ color: 'var(--gold)', fontFamily: 'monospace', fontWeight: 800 }}>
+        {fmt(h)}:{fmt(m)}:{fmt(s)}
+      </span>
+    </div>
+  );
+}
 
 const ELO_KEY = 'minetrainer_elo';
 
@@ -120,11 +147,21 @@ export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGai
           </div>
         )}
 
-        {mode === 'daily' && won && (
-          <p style={{ color: 'var(--gold)', fontSize: 13, marginBottom: 16, fontWeight: 700 }}>⭐ Daily Challenge выполнен!</p>
-        )}
-
-        {(mode !== 'daily' || !won) && (
+        {mode === 'daily' && won ? (
+          <>
+            <p style={{ color: 'var(--gold)', fontSize: 13, marginBottom: 12, fontWeight: 700 }}>⭐ Daily Challenge выполнен!</p>
+            <DailyCountdown />
+            <Link href="/game" style={{
+              display: 'block', background: 'var(--green)', color: '#0b1a08',
+              borderRadius: 4, padding: '14px 28px', fontSize: 16, fontWeight: 800,
+              letterSpacing: 2, textDecoration: 'none', textAlign: 'center',
+              fontFamily: "'Bebas Neue', Impact, sans-serif",
+              minHeight: 52, lineHeight: '24px',
+            }}>
+              В ГЛАВНОЕ МЕНЮ
+            </Link>
+          </>
+        ) : (
           <button onClick={onPlayAgain} style={{
             background: won ? 'var(--green)' : 'var(--bg-card-2)',
             color: won ? '#0b1a08' : 'var(--text)',
@@ -139,10 +176,6 @@ export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGai
             onMouseOut={e => (e.currentTarget.style.opacity = '1')}>
             {won ? 'ИГРАТЬ ЕЩЁ' : 'СНОВА В БОЙ'}
           </button>
-        )}
-
-        {mode === 'daily' && won && (
-          <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 8 }}>Новая карта завтра</p>
         )}
       </div>
     </div>

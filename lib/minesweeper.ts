@@ -76,28 +76,54 @@ export function placeMines(
   return calcNeighborCounts(newBoard, rows, cols);
 }
 
-export function createDailyBoard(rows: number, cols: number, mines: number, seed: number): Board {
+function _buildSeededBoard(rows: number, cols: number, mines: number, seed: number, safeZone: Set<string>): Board {
   const newBoard = createEmptyBoard(rows, cols);
   const rng = mulberry32(seed);
-
   const positions: [number, number][] = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      positions.push([r, c]);
-    }
-  }
-
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      if (!safeZone.has(`${r},${c}`)) positions.push([r, c]);
   for (let i = positions.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
-
   for (let i = 0; i < mines; i++) {
     const [r, c] = positions[i];
     newBoard[r][c].isMine = true;
   }
-
   return calcNeighborCounts(newBoard, rows, cols);
+}
+
+export function createDailyBoard(rows: number, cols: number, mines: number, seed: number): Board {
+  const centerRow = Math.floor(rows / 2);
+  const centerCol = Math.floor(cols / 2);
+
+  // 5×5 safe zone so cascade from center is always limited
+  const safeZone = new Set<string>();
+  for (let dr = -2; dr <= 2; dr++)
+    for (let dc = -2; dc <= 2; dc++) {
+      const sr = centerRow + dr, sc = centerCol + dc;
+      if (sr >= 0 && sr < rows && sc >= 0 && sc < cols) safeZone.add(`${sr},${sc}`);
+    }
+
+  // Find a seed offset where clicking center does NOT immediately win
+  for (let offset = 0; offset < 50; offset++) {
+    const board = _buildSeededBoard(rows, cols, mines, seed + offset, safeZone);
+    const afterClick = revealCell(board, centerRow, centerCol, rows, cols);
+    if (!checkWin(afterClick)) {
+      // Return the board with center already pre-revealed — one-click win is now impossible
+      return afterClick;
+    }
+  }
+  return _buildSeededBoard(rows, cols, mines, seed, safeZone);
+}
+
+export function createBoardFromMines(rows: number, cols: number, minePositions: [number, number][]): Board {
+  const board = createEmptyBoard(rows, cols);
+  for (const [r, c] of minePositions) {
+    if (r >= 0 && r < rows && c >= 0 && c < cols) board[r][c].isMine = true;
+  }
+  return calcNeighborCounts(board, rows, cols);
 }
 
 export function revealCell(board: Board, row: number, col: number, rows: number, cols: number): Board {

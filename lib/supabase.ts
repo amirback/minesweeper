@@ -23,6 +23,7 @@ export type GameResult = {
 };
 
 export type LeaderboardEntry = {
+  user_id?: string;
   username: string;
   time_seconds: number;
   created_at: string;
@@ -63,7 +64,7 @@ export async function getLeaderboard(
   if (!supabase) return [];
   let query = supabase
     .from('leaderboard_view')
-    .select('username, time_seconds, created_at, country, elo')
+    .select('user_id, username, time_seconds, created_at, country, elo')
     .eq('difficulty', difficulty)
     .eq('won', true)
     .eq('is_daily', isDaily)
@@ -109,6 +110,29 @@ export async function getUserProfile(userId: string) {
   return data as { username: string; elo: number; country: string } | null;
 }
 
+export async function getPublicProfile(userId: string) {
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, username, elo, country, player_id')
+    .eq('id', userId)
+    .single();
+  return data as { id: string; username: string; elo: number; country: string; player_id: string } | null;
+}
+
+export async function checkFriendship(myId: string, targetId: string): Promise<'none' | 'pending_sent' | 'pending_received' | 'accepted'> {
+  if (!supabase) return 'none';
+  const { data } = await supabase
+    .from('friendships')
+    .select('id, status, requester_id, addressee_id')
+    .or(`and(requester_id.eq.${myId},addressee_id.eq.${targetId}),and(requester_id.eq.${targetId},addressee_id.eq.${myId})`)
+    .maybeSingle();
+  if (!data) return 'none';
+  if (data.status === 'accepted') return 'accepted';
+  if (data.requester_id === myId) return 'pending_sent';
+  return 'pending_received';
+}
+
 export async function updateUserCountry(userId: string, country: string) {
   if (!supabase) return;
   await supabase.from('profiles').update({ country }).eq('id', userId);
@@ -143,7 +167,7 @@ export async function findPlayerByShortId(shortId: string) {
   const { data } = await supabase
     .from('profiles')
     .select('id, username')
-    .eq('player_id', clean)
+    .like('player_id', clean + '%')
     .maybeSingle();
   return data as { id: string; username: string } | null;
 }
@@ -224,6 +248,82 @@ export function subscribeToMessages(
         const { data: profile } = await supabase!.from('profiles').select('username').eq('id', row.from_id).single();
         onInsert({ id: row.id, from_id: row.from_id, to_id: row.to_id, content: row.content, created_at: row.created_at, from_name: profile?.username });
       })
+    .subscribe();
+  return () => supabase!.removeChannel(channel);
+}
+
+// ─── Duel Matches ─────────────────────────────────────────────────────────────
+
+export type Match = {
+  id: string;
+  player1_id: string;
+  player2_id: string | null;
+  player1_name: string | null;
+  player2_name: string | null;
+  status: 'waiting' | 'placing' | 'playing' | 'finished';
+  player1_mines: string | null;
+  player2_mines: string | null;
+  player1_time: number | null;
+  player2_time: number | null;
+  winner_id: string | null;
+  created_at: string;
+};
+
+export async function createMatch(player1Id: string, player1Name: string): Promise<Match | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase.from('matches')
+    .insert({ player1_id: player1Id, player1_name: player1Name, status: 'waiting' })
+    .select().single();
+  if (error) { console.error('createMatch', error); return null; }
+  return data as Match;
+}
+
+export async function joinMatch(matchId: string, player2Id: string, player2Name: string): Promise<Match | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase.from('matches')
+    .update({ player2_id: player2Id, player2_name: player2Name, status: 'placing' })
+    .eq('id', matchId).eq('status', 'waiting').select().single();
+  if (error) { console.error('joinMatch', error); return null; }
+  return data as Match;
+}
+
+export async function submitMines(matchId: string, playerNum: 1 | 2, mines: [number, number][], currentMatch: Match): Promise<void> {
+  if (!supabase) return;
+  const minesJson = JSON.stringify(mines);
+  const updates: Record<string, unknown> = playerNum === 1
+    ? { player1_mines: minesJson }
+    : { player2_mines: minesJson };
+  const opponentMines = playerNum === 1 ? currentMatch.player2_mines : currentMatch.player1_mines;
+  if (opponentMines) updates.status = 'playing';
+  await supabase.from('matches').update(updates).eq('id', matchId);
+}
+
+export async function recordMatchTime(matchId: string, playerNum: 1 | 2, time: number, currentMatch: Match): Promise<void> {
+  if (!supabase) return;
+  const updates: Record<string, unknown> = playerNum === 1
+    ? { player1_time: time } : { player2_time: time };
+  const otherTime = playerNum === 1 ? currentMatch.player2_time : currentMatch.player1_time;
+  if (otherTime !== null && otherTime !== undefined) {
+    const win = playerNum === 1 ? time < otherTime : time < otherTime;
+    updates.winner_id = win
+      ? (playerNum === 1 ? currentMatch.player1_id : currentMatch.player2_id)
+      : (playerNum === 1 ? currentMatch.player2_id : currentMatch.player1_id);
+    updates.status = 'finished';
+  }
+  await supabase.from('matches').update(updates).eq('id', matchId);
+}
+
+export async function getMatch(matchId: string): Promise<Match | null> {
+  if (!supabase) return null;
+  const { data } = await supabase.from('matches').select('*').eq('id', matchId).single();
+  return data as Match | null;
+}
+
+export function subscribeToMatch(matchId: string, onUpdate: (m: Match) => void) {
+  if (!supabase) return () => {};
+  const channel = supabase.channel(`match-${matchId}`)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches', filter: `id=eq.${matchId}` },
+      (payload) => onUpdate(payload.new as Match))
     .subscribe();
   return () => supabase!.removeChannel(channel);
 }

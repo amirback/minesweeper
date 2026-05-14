@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import type { Difficulty } from '@/types/game';
 import { DIFFICULTY_CONFIG } from '@/types/game';
 import { getLeaderboard, getCountryLeaderboard, isSupabaseConfigured, type LeaderboardEntry } from '@/lib/supabase';
@@ -139,7 +140,15 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#151728', borderRadius: 8, padding: '10px 14px', border: '1px solid #1e2235' }}>
                 <span style={{ fontSize: 16, minWidth: 24, textAlign: 'center' }}>{i < 3 ? MEDALS[i] : `${i + 1}`}</span>
                 {entry.country && <span style={{ fontSize: 15 }}>{COUNTRY_FLAGS[entry.country] ?? '🌍'}</span>}
-                <span style={{ flex: 1, color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{entry.username}</span>
+                {entry.user_id ? (
+                  <Link href={`/player/${entry.user_id}`} style={{ flex: 1, color: '#4ade80', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
+                    onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')}
+                    onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}>
+                    {entry.username}
+                  </Link>
+                ) : (
+                  <span style={{ flex: 1, color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{entry.username}</span>
+                )}
                 {rank && <span style={{ fontSize: 13 }} title={rank.name}>{rank.icon}</span>}
                 <span style={{ color: '#60a5fa', fontWeight: 700, fontFamily: 'monospace', fontSize: 15 }}>{formatTime(entry.time_seconds)}</span>
                 <span style={{ color: '#475569', fontSize: 11 }}>{new Date(entry.created_at).toLocaleDateString()}</span>

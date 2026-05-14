@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
 import { Board } from '@/components/game/Board';
@@ -12,6 +14,8 @@ import { NavBar } from '@/components/NavBar';
 import { AuthModal } from '@/components/AuthModal';
 import { LiveFeed } from '@/components/LiveFeed';
 import { StatsPanel } from '@/components/StatsPanel';
+import { createMatch } from '@/lib/supabase';
+import { getUserProfile } from '@/lib/supabase';
 import type { Difficulty } from '@/types/game';
 
 type GameAreaProps = { userId?: string; onPlayAgain: () => void };
@@ -47,7 +51,7 @@ function GameArea({ userId, onPlayAgain }: GameAreaProps) {
             borderRadius: 8, padding: '8px 12px', fontSize: 12,
             color: 'var(--text-2)', maxWidth: 380, textAlign: 'center',
           }}>
-            <strong style={{ color: 'var(--green-hi)' }}>AI-Coach</strong> — показывает вероятность мины в каждой клетке.{' '}
+            🎯 Вероятность мины в каждой клетке.{' '}
             <span style={{ color: '#4ca832' }}>Зелёный = безопаснее</span>,{' '}
             <span style={{ color: 'var(--danger)' }}>красный = опасно</span>.
           </div>
@@ -70,6 +74,18 @@ export default function GamePage() {
   const { user, signOut, signInWithEmail, signUpWithEmail } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [creating, setCreating] = useState(false);
+  const router = useRouter();
+
+  const handleCreateMatch = async () => {
+    if (!user) { setAuthOpen(true); return; }
+    setCreating(true);
+    const prof = await getUserProfile(user.id);
+    const name = prof?.username ?? user.email?.split('@')[0] ?? 'Player';
+    const match = await createMatch(user.id, name);
+    setCreating(false);
+    if (match) router.push(`/duel/${match.id}`);
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -96,6 +112,29 @@ export default function GamePage() {
             display: 'flex', flexDirection: 'column', gap: 16,
             width: 260, flexShrink: 0,
           }}>
+            {/* Create Match */}
+            <button
+              onClick={handleCreateMatch}
+              disabled={creating}
+              style={{
+                width: '100%', background: 'rgba(245,158,11,0.15)',
+                border: '2px solid rgba(245,158,11,0.5)', borderRadius: 8,
+                padding: '12px 16px', cursor: creating ? 'wait' : 'pointer',
+                display: 'flex', alignItems: 'center', gap: 10,
+                transition: 'all 0.15s',
+              }}
+              onMouseOver={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.25)')}
+              onMouseOut={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
+            >
+              <span style={{ fontSize: 22 }}>⚔️</span>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", fontSize: 17, letterSpacing: 2, color: 'var(--gold)' }}>
+                  {creating ? 'СОЗДАЁМ...' : 'СОЗДАТЬ МАТЧ'}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-dim)' }}>Дуэль 1 на 1</div>
+              </div>
+            </button>
+
             <StatsPanel />
 
             <div style={{

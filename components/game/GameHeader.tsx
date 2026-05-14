@@ -4,6 +4,7 @@ import React from 'react';
 import type { Difficulty, GameStatus } from '@/types/game';
 import { DIFFICULTY_CONFIG } from '@/types/game';
 import { formatTime } from '@/lib/minesweeper';
+import { useLang } from '@/contexts/LanguageContext';
 
 type GameHeaderProps = {
   status: GameStatus;
@@ -35,6 +36,7 @@ export function GameHeader({
   difficulty, showProbability, flagMode, mode = 'normal',
   onReset, onDifficultyChange, onToggleProbability, onToggleFlagMode,
 }: GameHeaderProps) {
+  const { tr } = useLang();
   const remaining = Math.max(0, minesTotal - flagsPlaced);
   const flagsLeft  = maxFlags - flagsUsed;
   const exhausted  = flagsLeft <= 0;
@@ -105,7 +107,7 @@ export function GameHeader({
           color: showProbability ? 'var(--green-hi)' : 'var(--text-2)',
           transition: 'all 0.15s',
         }}>
-          🎯 AI-подсказки {showProbability ? 'ВКЛ' : 'ВЫКЛ'}
+          🎯 {tr.aiHints} {showProbability ? tr.on : tr.off}
         </button>
 
         <button onClick={onToggleFlagMode}

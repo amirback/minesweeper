@@ -138,14 +138,26 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <Link href="/settings" style={{
-                background: 'rgba(34,197,94,0.12)', border: '1px solid var(--border-hi)',
-                color: 'var(--green-hi)', borderRadius: 6, padding: '8px 16px',
-                fontSize: 13, fontWeight: 800, textDecoration: 'none',
-                display: 'flex', alignItems: 'center', gap: 6,
-              }}>
-                ✏️ {tr.edit}
-              </Link>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Link href="/settings" style={{
+                  background: 'rgba(34,197,94,0.12)', border: '1px solid var(--border-hi)',
+                  color: 'var(--green-hi)', borderRadius: 6, padding: '8px 16px',
+                  fontSize: 13, fontWeight: 800, textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                  ✏️ {tr.edit}
+                </Link>
+                {user && (
+                  <Link href={`/player/${user.id}`} style={{
+                    background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)',
+                    color: 'var(--text-2)', borderRadius: 6, padding: '8px 16px',
+                    fontSize: 13, fontWeight: 700, textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                  }}>
+                    🔗 Публичный профиль
+                  </Link>
+                )}
+              </div>
             </div>
 
             {/* ── Stats row ── */}

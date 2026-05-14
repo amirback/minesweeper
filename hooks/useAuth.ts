@@ -23,10 +23,13 @@ export function useAuth() {
   const ensureProfile = async (userId: string, email?: string, username?: string) => {
     if (!supabase) return;
     const fallback = username ?? email?.split('@')[0] ?? 'Player';
+    const playerId = userId.replace(/-/g, '').toUpperCase();
     await supabase.from('profiles').upsert(
-      { id: userId, username: fallback },
+      { id: userId, username: fallback, player_id: playerId },
       { onConflict: 'id', ignoreDuplicates: true }
     );
+    // Patch existing profiles missing player_id
+    await supabase.from('profiles').update({ player_id: playerId }).eq('id', userId).is('player_id', null);
   };
 
   const signOut = async () => {
@@ -41,7 +44,17 @@ export function useAuth() {
       return { error: new Error(translateAuthError(result.error.message)) };
     }
     if (result.data.user) {
-      await ensureProfile(result.data.user.id, email);
+      const pendingUsername = typeof window !== 'undefined'
+        ? localStorage.getItem(`saper_reg_username_${email}`) ?? undefined
+        : undefined;
+      await ensureProfile(result.data.user.id, email, pendingUsername);
+      if (pendingUsername) {
+        const { data: prof } = await supabase.from('profiles').select('username').eq('id', result.data.user.id).single();
+        if (!prof || prof.username === email.split('@')[0]) {
+          await supabase.from('profiles').update({ username: pendingUsername }).eq('id', result.data.user.id);
+        }
+        typeof window !== 'undefined' && localStorage.removeItem(`saper_reg_username_${email}`);
+      }
     }
     return result;
   };
@@ -56,8 +69,12 @@ export function useAuth() {
     if (!data.user || (data.user.identities && data.user.identities.length === 0)) {
       return { error: new Error('Аккаунт с этой почтой уже существует') };
     }
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`saper_reg_username_${email}`, username);
+    }
+    const playerId = data.user.id.replace(/-/g, '').toUpperCase();
     await supabase.from('profiles').upsert(
-      { id: data.user.id, username },
+      { id: data.user.id, username, player_id: playerId },
       { onConflict: 'id', ignoreDuplicates: true }
     );
     return { error: null };
