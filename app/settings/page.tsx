@@ -96,6 +96,37 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* ── Player ID ── */}
+        {user && (
+          <div style={section}>
+            <div style={sTitle}>
+              🪪 {lang === 'ru' ? 'Ваш ID игрока' : lang === 'kz' ? 'Ойыншы ID' : 'Your Player ID'}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <code style={{
+                background: 'rgba(127,196,53,0.12)', border: '1px solid var(--border-hi)',
+                borderRadius: 4, padding: '8px 14px', fontSize: 15, color: 'var(--green-hi)',
+                letterSpacing: 2, fontFamily: 'monospace', userSelect: 'all',
+              }}>
+                {user.id.replace(/-/g, '').slice(0, 12).toUpperCase()}
+              </code>
+              <button
+                onClick={() => navigator.clipboard.writeText(user.id.replace(/-/g, '').slice(0, 12).toUpperCase())}
+                style={{
+                  background: 'transparent', border: '1px solid var(--border)', borderRadius: 4,
+                  padding: '8px 14px', fontSize: 13, color: 'var(--text-2)', cursor: 'pointer', fontWeight: 700,
+                }}>
+                {lang === 'ru' ? 'Копировать' : lang === 'kz' ? 'Көшіру' : 'Copy'}
+              </button>
+            </div>
+            <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 10 }}>
+              {lang === 'ru' && 'Поделитесь этим ID с друзьями чтобы они могли вас найти'}
+              {lang === 'en' && 'Share this ID with friends so they can find you'}
+              {lang === 'kz' && 'Бұл ID-ді достарыңызбен бөлісіңіз'}
+            </p>
+          </div>
+        )}
+
         {/* ── Nickname ── */}
         <div style={section}>
           <div style={sTitle}>

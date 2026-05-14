@@ -28,6 +28,7 @@ export const t = {
     bestTimes: 'Best Times',
     noResults: 'No results yet. Be the first! 🏆',
     activity: 'Activity',
+    friends: 'Friends',
   },
   ru: {
     play: 'ИГРАТЬ', daily: 'Daily', leaderboard: 'Рейтинг',
@@ -50,6 +51,7 @@ export const t = {
     bestTimes: 'Лучшее время',
     noResults: 'Пока нет результатов. Будь первым! 🏆',
     activity: 'Активность',
+    friends: 'Друзья',
   },
   kz: {
     play: 'ОЙНАУ', daily: 'Күнделікті', leaderboard: 'Рейтинг',
@@ -72,6 +74,7 @@ export const t = {
     bestTimes: 'Үздік уақыт',
     noResults: 'Әлі нәтиже жоқ. Бірінші бол! 🏆',
     activity: 'Белсенділік',
+    friends: 'Достар',
   },
 } as const;
 

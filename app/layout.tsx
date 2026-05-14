@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
-      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', color: 'var(--text)' }}>
+      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', color: 'var(--text)' }}>
         <LanguageProvider>
           {children}
         </LanguageProvider>

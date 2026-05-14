@@ -123,6 +123,100 @@ export async function updateUsername(userId: string, username: string) {
   return { error };
 }
 
+// ─── Friends & Chat ────────────────────────────────────────────────────────
+
+export async function findPlayerByShortId(shortId: string) {
+  if (!supabase) return null;
+  const clean = shortId.toUpperCase().replace(/[^A-F0-9]/g, '');
+  if (clean.length < 8) return null;
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, username')
+    .eq('player_id', clean)
+    .maybeSingle();
+  return data as { id: string; username: string } | null;
+}
+
+export async function sendFriendRequest(myId: string, targetId: string) {
+  if (!supabase) return { error: 'not configured' };
+  const { error } = await supabase.from('friendships').insert({ requester_id: myId, addressee_id: targetId });
+  return { error };
+}
+
+export async function respondToFriendRequest(requestId: string, accept: boolean) {
+  if (!supabase) return { error: 'not configured' };
+  const { error } = await supabase
+    .from('friendships')
+    .update({ status: accept ? 'accepted' : 'declined' })
+    .eq('id', requestId);
+  return { error };
+}
+
+export type FriendEntry = {
+  id: string; status: string;
+  requester_id: string; addressee_id: string;
+  requester_name: string; addressee_name: string;
+};
+
+export async function getFriendships(myId: string): Promise<FriendEntry[]> {
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from('friendships')
+    .select('id, status, requester_id, addressee_id, req:profiles!friendships_requester_id_fkey(username), adr:profiles!friendships_addressee_id_fkey(username)')
+    .or(`requester_id.eq.${myId},addressee_id.eq.${myId}`)
+    .neq('status', 'declined');
+  if (!data) return [];
+  return data.map((r: any) => ({
+    id: r.id, status: r.status,
+    requester_id: r.requester_id, addressee_id: r.addressee_id,
+    requester_name: r.req?.username ?? '?', addressee_name: r.adr?.username ?? '?',
+  }));
+}
+
+export type ChatMessage = {
+  id: string; from_id: string; to_id: string;
+  content: string; created_at: string; from_name?: string;
+};
+
+export async function getMessages(myId: string, friendId: string): Promise<ChatMessage[]> {
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from('messages')
+    .select('id, from_id, to_id, content, created_at, sender:profiles!messages_from_id_fkey(username)')
+    .or(`and(from_id.eq.${myId},to_id.eq.${friendId}),and(from_id.eq.${friendId},to_id.eq.${myId})`)
+    .order('created_at', { ascending: true })
+    .limit(100);
+  if (!data) return [];
+  return data.map((r: any) => ({
+    id: r.id, from_id: r.from_id, to_id: r.to_id,
+    content: r.content, created_at: r.created_at,
+    from_name: r.sender?.username,
+  }));
+}
+
+export async function sendMessage(fromId: string, toId: string, content: string) {
+  if (!supabase) return { error: 'not configured' };
+  const { error } = await supabase.from('messages').insert({ from_id: fromId, to_id: toId, content });
+  return { error };
+}
+
+export function subscribeToMessages(
+  myId: string,
+  onInsert: (msg: ChatMessage) => void
+) {
+  if (!supabase) return () => {};
+  const channel = supabase
+    .channel(`messages-${myId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `to_id=eq.${myId}` },
+      async (payload) => {
+        const row = payload.new as any;
+        const { data: profile } = await supabase!.from('profiles').select('username').eq('id', row.from_id).single();
+        onInsert({ id: row.id, from_id: row.from_id, to_id: row.to_id, content: row.content, created_at: row.created_at, from_name: profile?.username });
+      })
+    .subscribe();
+  return () => supabase!.removeChannel(channel);
+}
+
 export function subscribeToLiveFeed(
   onInsert: (entry: LiveFeedEntry) => void
 ) {

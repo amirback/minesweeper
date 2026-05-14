@@ -68,10 +68,11 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
 
       {/* Links */}
       <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 2, overflow: 'hidden' }}>
-        <Link href="/daily"       style={link} onMouseOver={e=>(e.currentTarget.style.color='#fff')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.daily}</Link>
-        <Link href="/leaderboard" style={link} onMouseOver={e=>(e.currentTarget.style.color='#fff')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.leaderboard}</Link>
-        <Link href="/stats"       style={link} onMouseOver={e=>(e.currentTarget.style.color='#fff')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.stats}</Link>
-        <Link href="/settings"    style={link} onMouseOver={e=>(e.currentTarget.style.color='#fff')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>⚙️ {tr.settings}</Link>
+        <Link href="/daily"       style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.daily}</Link>
+        <Link href="/leaderboard" style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.leaderboard}</Link>
+        <Link href="/stats"       style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.stats}</Link>
+        <Link href="/friends"     style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>👥 {tr.friends ?? 'Friends'}</Link>
+        <Link href="/settings"    style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>⚙️ {tr.settings}</Link>
       </div>
 
       {/* Right side */}

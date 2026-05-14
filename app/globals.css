@@ -2,16 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap');
 
 :root {
-  --bg:          #0c0e0b;
-  --bg-card:     rgba(255,255,255,0.05);
-  --bg-card-2:   rgba(255,255,255,0.03);
-  --border:      rgba(255,255,255,0.10);
-  --border-hi:   rgba(127,196,53,0.55);
+  --bg:          #b8dc82;
+  --bg-card:     rgba(10,20,6,0.94);
+  --bg-card-2:   rgba(6,14,3,0.93);
+  --border:      rgba(127,196,53,0.28);
+  --border-hi:   rgba(127,196,53,0.60);
   --green:       #5a9028;
   --green-hi:    #7fc435;
   --text:        #ffffff;
   --text-2:      rgba(255,255,255,0.65);
-  --text-dim:    rgba(255,255,255,0.30);
+  --text-dim:    rgba(255,255,255,0.35);
   --danger:      #e04422;
   --gold:        #d4b040;
   --cell-un:     #1e2c14;
@@ -21,7 +21,10 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: url('/puzzle.svg');
+  background-size: 200px 200px;
+  background-repeat: repeat;
   color: var(--text);
   font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100%;
@@ -75,16 +78,9 @@ html, body {
 
 button { -webkit-user-select:none; user-select:none; }
 
-/* Camo landing background */
+/* Camo landing background — now transparent to show puzzle */
 .camo-bg {
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse 200px 140px at 8%  18%, rgba(40,70,22,0.5) 0%, transparent 100%),
-    radial-gradient(ellipse 160px 220px at 28% 72%, rgba(18,36,10,0.65) 0%, transparent 100%),
-    radial-gradient(ellipse 180px 100px at 58% 28%, rgba(35,58,18,0.55) 0%, transparent 100%),
-    radial-gradient(ellipse 120px 180px at 82% 62%, rgba(16,30,8,0.75) 0%, transparent 100%),
-    radial-gradient(ellipse 160px 120px at 48% 88%, rgba(38,62,20,0.5) 0%, transparent 100%),
-    radial-gradient(ellipse 100px 80px  at 72% 12%, rgba(28,48,14,0.6) 0%, transparent 100%);
+  background: transparent;
 }
 
 /* White card variant */
