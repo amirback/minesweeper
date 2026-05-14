@@ -93,7 +93,6 @@ export function GameHeader({
           <span style={{ color: 'var(--green-hi)', fontWeight: 800, fontSize: 20, fontFamily: 'monospace' }}>
             {formatTime(timer)}
           </span>
-          <span style={{ fontSize: 16 }}>⏱</span>
         </div>
       </div>
 
@@ -107,7 +106,7 @@ export function GameHeader({
           color: showProbability ? 'var(--green-hi)' : 'var(--text-2)',
           transition: 'all 0.15s',
         }}>
-          🎯 {tr.aiHints} {showProbability ? tr.on : tr.off}
+          {tr.aiHints} {showProbability ? tr.on : tr.off}
         </button>
 
         <button onClick={onToggleFlagMode}

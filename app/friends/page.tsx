@@ -149,7 +149,7 @@ export default function FriendsPage() {
           fontFamily: "'Bebas Neue', Impact, sans-serif",
           fontSize: 'clamp(32px,8vw,48px)', letterSpacing: 6, color: 'var(--green-hi)',
         }}>
-          👥 {t.title}
+          {t.title}
         </h1>
 
         {!user ? (
@@ -160,7 +160,7 @@ export default function FriendsPage() {
           <>
             {/* Add Friend */}
             <div style={card}>
-              <div style={cardTitle}>➕ {t.addFriend}</div>
+              <div style={cardTitle}>{t.addFriend}</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 <input
                   type="text"
@@ -206,7 +206,7 @@ export default function FriendsPage() {
             {/* Incoming requests */}
             {incomingPending.length > 0 && (
               <div style={card}>
-                <div style={cardTitle}>🔔 {t.incoming} ({incomingPending.length})</div>
+                <div style={cardTitle}>{t.incoming} ({incomingPending.length})</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {incomingPending.map(f => (
                     <div key={f.id} style={{
@@ -234,7 +234,7 @@ export default function FriendsPage() {
 
             {/* Friends list */}
             <div style={card}>
-              <div style={cardTitle}>✅ {t.accepted}</div>
+              <div style={cardTitle}>{t.accepted}</div>
               {accepted.length === 0 ? (
                 <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>{t.noFriends}</p>
               ) : (
@@ -250,7 +250,7 @@ export default function FriendsPage() {
                           borderRadius: 6, padding: '10px 14px', flexWrap: 'wrap', gap: 8,
                           border: isActive ? '1px solid var(--border-hi)' : '1px solid transparent',
                         }}>
-                          <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>👤 {name}</span>
+                          <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>{name}</span>
                           <button
                             onClick={() => isActive ? setActiveFriend(null) : openChat(f)}
                             style={{
@@ -259,7 +259,7 @@ export default function FriendsPage() {
                               border: isActive ? '1px solid var(--border)' : 'none',
                               borderRadius: 4, padding: '6px 14px', fontSize: 13, fontWeight: 800, cursor: 'pointer',
                             }}>
-                            {isActive ? '✕' : `💬 ${t.chat}`}
+                            {isActive ? '✕' : t.chat}
                           </button>
                         </div>
 
@@ -341,13 +341,13 @@ export default function FriendsPage() {
             {/* Outgoing pending */}
             {outgoingPending.length > 0 && (
               <div style={card}>
-                <div style={cardTitle}>📤 {t.outgoing}</div>
+                <div style={cardTitle}>{t.outgoing}</div>
                 {outgoingPending.map(f => (
                   <div key={f.id} style={{
                     color: 'var(--text-2)', fontSize: 14, padding: '6px 0',
                     borderBottom: '1px solid var(--border)',
                   }}>
-                    ⏳ {f.addressee_name}
+                    {f.addressee_name}
                   </div>
                 ))}
               </div>

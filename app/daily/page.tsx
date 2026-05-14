@@ -85,7 +85,7 @@ export default function DailyPage() {
             color: 'var(--text)', display: 'flex', alignItems: 'center',
             justifyContent: 'center', gap: 10, marginBottom: 4,
           }}>
-            📅 Daily Challenge
+            Daily Challenge
           </h1>
           <p style={{ color: 'var(--text-2)', fontSize: 13 }}>
             {today} · Одна карта для всех · Средняя сложность
@@ -96,7 +96,6 @@ export default function DailyPage() {
           /* ── Cooldown locked ── */
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%' }}>
             <div style={section}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🏆</div>
               <h2 style={{
                 fontFamily: "'Bebas Neue', Impact, sans-serif",
                 fontSize: 28, letterSpacing: 3, color: 'var(--green-hi)', marginBottom: 8,
@@ -149,8 +148,8 @@ export default function DailyPage() {
 
             {(dailyCompleted || status === 'won') && (
               <div style={{ width: '100%', maxWidth: 600, marginTop: 8 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  🏆 Сегодняшний рейтинг
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-2)', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' }}>
+                  Сегодняшний рейтинг
                 </h2>
                 <Leaderboard isDaily={true} dailyDate={today} currentUserId={user?.id} />
               </div>

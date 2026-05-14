@@ -145,7 +145,7 @@ export default function ProfilePage() {
                   fontSize: 13, fontWeight: 800, textDecoration: 'none',
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}>
-                  ✏️ {tr.edit}
+                  {tr.edit}
                 </Link>
                 {user && (
                   <Link href={`/player/${user.id}`} style={{
@@ -154,7 +154,7 @@ export default function ProfilePage() {
                     fontSize: 13, fontWeight: 700, textDecoration: 'none',
                     display: 'flex', alignItems: 'center', gap: 6,
                   }}>
-                    🔗 Публичный профиль
+                    Публичный профиль
                   </Link>
                 )}
               </div>
@@ -200,7 +200,7 @@ export default function ProfilePage() {
             {stats && (
               <div style={section}>
                 <div style={{ fontWeight: 800, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 14, color: 'var(--text-2)' }}>
-                  🏆 {tr.bestTime}
+                  {tr.bestTime}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => {
@@ -222,7 +222,7 @@ export default function ProfilePage() {
             {stats && (
               <div style={section}>
                 <div style={{ color: 'var(--text-2)', fontWeight: 800, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 14 }}>
-                  📋 {tr.activity}
+                  {tr.activity}
                 </div>
                 {stats.recent.length === 0 ? (
                   <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>{tr.noGames}</p>

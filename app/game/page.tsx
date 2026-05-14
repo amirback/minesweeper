@@ -51,7 +51,7 @@ function GameArea({ userId, onPlayAgain }: GameAreaProps) {
             borderRadius: 8, padding: '8px 12px', fontSize: 12,
             color: 'var(--text-2)', maxWidth: 380, textAlign: 'center',
           }}>
-            🎯 Вероятность мины в каждой клетке.{' '}
+            Вероятность мины в каждой клетке.{' '}
             <span style={{ color: '#4ca832' }}>Зелёный = безопаснее</span>,{' '}
             <span style={{ color: 'var(--danger)' }}>красный = опасно</span>.
           </div>
@@ -108,7 +108,7 @@ export default function GamePage() {
           />
 
           {/* Sidebar */}
-          <div style={{
+          <div className="game-sidebar" style={{
             display: 'flex', flexDirection: 'column', gap: 16,
             width: 260, flexShrink: 0,
           }}>

@@ -79,7 +79,7 @@ export default function SettingsPage() {
 
         {/* ── Language ── */}
         <div style={section}>
-          <div style={sTitle}>🌐 {tr.languageLabel}</div>
+          <div style={sTitle}>{tr.languageLabel}</div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {(['en', 'ru', 'kz'] as Lang[]).map(l => (
               <button key={l} onClick={() => setLang(l)} style={{
@@ -100,7 +100,7 @@ export default function SettingsPage() {
         {user && (
           <div style={section}>
             <div style={sTitle}>
-              🪪 {lang === 'ru' ? 'Ваш ID игрока' : lang === 'kz' ? 'Ойыншы ID' : 'Your Player ID'}
+              {lang === 'ru' ? 'Ваш ID игрока' : lang === 'kz' ? 'Ойыншы ID' : 'Your Player ID'}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <code style={{
@@ -130,7 +130,7 @@ export default function SettingsPage() {
         {/* ── Nickname ── */}
         <div style={section}>
           <div style={sTitle}>
-            ✏️ {lang === 'ru' ? 'Никнейм' : lang === 'kz' ? 'Лақап аты' : 'Nickname'}
+            {lang === 'ru' ? 'Никнейм' : lang === 'kz' ? 'Лақап аты' : 'Nickname'}
           </div>
 
           {!user ? (
@@ -183,7 +183,7 @@ export default function SettingsPage() {
 
         {/* ── Avatar ── */}
         <div style={section}>
-          <div style={sTitle}>🪖 {tr.avatarLabel}</div>
+          <div style={sTitle}>{tr.avatarLabel}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {AVATARS.map(av => (
               <button key={av.id} onClick={() => setSelectedAvatar(av.id)} style={{
@@ -233,7 +233,7 @@ export default function SettingsPage() {
 
         {/* ── Support ── */}
         <div style={section}>
-          <div style={sTitle}>📬 {tr.supportTitle}</div>
+          <div style={sTitle}>{tr.supportTitle}</div>
           <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 14, lineHeight: 1.6 }}>
             {tr.supportText}
           </p>
@@ -248,7 +248,7 @@ export default function SettingsPage() {
             }}
             onMouseOver={e => (e.currentTarget.style.background = 'rgba(127,196,53,0.1)')}
             onMouseOut={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}>
-            ✉️ saperminesweeper@gmail.com
+            saperminesweeper@gmail.com
           </a>
           <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 10 }}>
             {lang === 'ru' && 'Обычно отвечаем в течение 24 часов'}
