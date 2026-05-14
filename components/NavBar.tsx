@@ -107,18 +107,12 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
 
           {isSupabaseConfigured && (
             user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-                  <AvatarDisplay id={avatarId} size={32} />
-                  <span className="hide-mobile" style={{ color: 'var(--green-hi)', fontSize: 13, fontWeight: 700 }}>
-                    {user.email?.split('@')[0]}
-                  </span>
-                </Link>
-                <button onClick={onSignOut} className="hide-mobile"
-                  style={{ background: 'var(--bg-card-2)', color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 4, padding: '4px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
-                  {tr.signOut}
-                </button>
-              </div>
+              <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+                <AvatarDisplay id={avatarId} size={32} />
+                <span className="hide-mobile" style={{ color: 'var(--green-hi)', fontSize: 13, fontWeight: 700 }}>
+                  {user.email?.split('@')[0]}
+                </span>
+              </Link>
             ) : (
               <button onClick={onOpenAuth}
                 style={{ background: 'var(--green)', color: '#0b1a08', border: 'none', borderRadius: 4, padding: '6px 16px', fontSize: 13, cursor: 'pointer', fontWeight: 800, letterSpacing: 0.5 }}>

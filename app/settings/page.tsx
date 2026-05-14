@@ -257,6 +257,21 @@ export default function SettingsPage() {
           </p>
         </div>
 
+        {user && (
+          <button
+            onClick={signOut}
+            style={{
+              width: '100%', maxWidth: 340,
+              background: 'transparent', border: '1px solid var(--danger)',
+              color: 'var(--danger)', borderRadius: 4,
+              padding: '12px', fontSize: 14, fontWeight: 800,
+              cursor: 'pointer', letterSpacing: 1,
+              fontFamily: "'Bebas Neue', Impact, sans-serif",
+            }}>
+            {lang === 'ru' ? 'ВЫЙТИ ИЗ АККАУНТА' : lang === 'kz' ? 'АККАУНТТАН ШЫҒУ' : 'SIGN OUT'}
+          </button>
+        )}
+
         <Link href="/game" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 13 }}>
           ← {lang === 'ru' ? 'Назад к игре' : lang === 'kz' ? 'Ойынға оралу' : 'Back to game'}
         </Link>
