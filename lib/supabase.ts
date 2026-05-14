@@ -123,6 +123,17 @@ export async function updateUsername(userId: string, username: string) {
   return { error };
 }
 
+export async function getUserStats(userId: string) {
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from('game_results')
+    .select('difficulty, time_seconds, won, created_at, is_daily')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(300);
+  return data as (GameResult & { created_at: string })[] | null;
+}
+
 // ─── Friends & Chat ────────────────────────────────────────────────────────
 
 export async function findPlayerByShortId(shortId: string) {

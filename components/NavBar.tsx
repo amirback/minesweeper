@@ -71,6 +71,7 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
         <Link href="/daily"       style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.daily}</Link>
         <Link href="/leaderboard" style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.leaderboard}</Link>
         <Link href="/stats"       style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.stats}</Link>
+        <Link href="/profile"     style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>👤 {tr.profile ?? 'Profile'}</Link>
         <Link href="/friends"     style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>👥 {tr.friends ?? 'Friends'}</Link>
         <Link href="/settings"    style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>⚙️ {tr.settings}</Link>
       </div>
@@ -91,10 +92,12 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
         {isSupabaseConfigured && (
           user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AvatarDisplay id={avatarId} size={32} />
-              <span className="hide-mobile" style={{ color: 'var(--green-hi)', fontSize: 13, fontWeight: 700 }}>
-                {user.email?.split('@')[0]}
-              </span>
+              <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+                <AvatarDisplay id={avatarId} size={32} />
+                <span className="hide-mobile" style={{ color: 'var(--green-hi)', fontSize: 13, fontWeight: 700 }}>
+                  {user.email?.split('@')[0]}
+                </span>
+              </Link>
               <button onClick={onSignOut}
                 style={{ background: 'var(--bg-card-2)', color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: 4, padding: '4px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 700 }}>
                 {tr.signOut}

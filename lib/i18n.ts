@@ -29,6 +29,7 @@ export const t = {
     noResults: 'No results yet. Be the first! 🏆',
     activity: 'Activity',
     friends: 'Friends',
+    profile: 'Profile',
   },
   ru: {
     play: 'ИГРАТЬ', daily: 'Daily', leaderboard: 'Рейтинг',
@@ -52,6 +53,7 @@ export const t = {
     noResults: 'Пока нет результатов. Будь первым! 🏆',
     activity: 'Активность',
     friends: 'Друзья',
+    profile: 'Профиль',
   },
   kz: {
     play: 'ОЙНАУ', daily: 'Күнделікті', leaderboard: 'Рейтинг',
@@ -75,6 +77,7 @@ export const t = {
     noResults: 'Әлі нәтиже жоқ. Бірінші бол! 🏆',
     activity: 'Белсенділік',
     friends: 'Достар',
+    profile: 'Профиль',
   },
 } as const;
 
