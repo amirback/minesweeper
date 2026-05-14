@@ -114,6 +114,15 @@ export async function updateUserCountry(userId: string, country: string) {
   await supabase.from('profiles').update({ country }).eq('id', userId);
 }
 
+export async function updateUsername(userId: string, username: string) {
+  if (!supabase) return { error: 'not configured' };
+  const { error } = await supabase
+    .from('profiles')
+    .update({ username })
+    .eq('id', userId);
+  return { error };
+}
+
 export function subscribeToLiveFeed(
   onInsert: (entry: LiveFeedEntry) => void
 ) {

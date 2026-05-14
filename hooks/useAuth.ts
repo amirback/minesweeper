@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, updateUsername } from '@/lib/supabase';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -10,16 +10,13 @@ export function useAuth() {
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
@@ -40,11 +37,11 @@ export function useAuth() {
   const signInWithEmail = async (email: string, password: string) => {
     if (!supabase) return { error: new Error('Supabase не настроен') };
     const result = await supabase.auth.signInWithPassword({ email, password });
-    if (!result.error && result.data.user) {
-      await ensureProfile(result.data.user.id, email);
-    }
     if (result.error) {
       return { error: new Error(translateAuthError(result.error.message)) };
+    }
+    if (result.data.user) {
+      await ensureProfile(result.data.user.id, email);
     }
     return result;
   };
@@ -53,12 +50,23 @@ export function useAuth() {
     if (!supabase) return { error: new Error('Supabase не настроен') };
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      return { error: new Error(translateAuthError(error.message)), data: null };
+      return { error: new Error(translateAuthError(error.message)) };
     }
-    if (data.user) {
-      await ensureProfile(data.user.id, email, username);
+    // Supabase bug: duplicate email returns user with empty identities instead of error
+    if (!data.user || (data.user.identities && data.user.identities.length === 0)) {
+      return { error: new Error('Аккаунт с этой почтой уже существует') };
     }
-    return { data, error: null };
+    await supabase.from('profiles').upsert(
+      { id: data.user.id, username },
+      { onConflict: 'id', ignoreDuplicates: true }
+    );
+    return { error: null };
+  };
+
+  const changeUsername = async (newUsername: string) => {
+    if (!user) return { error: 'Нужно войти в аккаунт' };
+    const { error } = await updateUsername(user.id, newUsername);
+    return { error };
   };
 
   const getUsername = async (userId: string): Promise<string> => {
@@ -67,7 +75,7 @@ export function useAuth() {
     return data?.username ?? 'Player';
   };
 
-  return { user, loading, signOut, signInWithEmail, signUpWithEmail, getUsername };
+  return { user, loading, signOut, signInWithEmail, signUpWithEmail, changeUsername, getUsername };
 }
 
 function translateAuthError(msg: string): string {
@@ -84,7 +92,5 @@ function translateAuthError(msg: string): string {
     return 'Слишком много попыток, подождите немного';
   if (m.includes('invalid email'))
     return 'Введите корректный email';
-  if (m.includes('network') || m.includes('fetch'))
-    return 'Нет соединения с сервером';
   return msg;
 }

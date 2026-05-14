@@ -2,20 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap');
 
 :root {
-  --bg:          #0d1e0a;
-  --bg-card:     #162612;
-  --bg-card-2:   #1e3319;
-  --border:      #2e4e1c;
-  --border-hi:   #4e7a2a;
+  --bg:          #0c0e0b;
+  --bg-card:     rgba(255,255,255,0.05);
+  --bg-card-2:   rgba(255,255,255,0.03);
+  --border:      rgba(255,255,255,0.10);
+  --border-hi:   rgba(127,196,53,0.55);
   --green:       #5a9028;
   --green-hi:    #7fc435;
   --text:        #ffffff;
-  --text-2:      #b8d890;
-  --text-dim:    #607848;
+  --text-2:      rgba(255,255,255,0.65);
+  --text-dim:    rgba(255,255,255,0.30);
   --danger:      #e04422;
   --gold:        #d4b040;
-  --cell-un:     #2a4218;
-  --cell-rev:    #0c1a09;
+  --cell-un:     #1e2c14;
+  --cell-rev:    #090d07;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
