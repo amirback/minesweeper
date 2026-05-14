@@ -5,12 +5,13 @@ export type DifficultyConfig = {
   cols: number;
   mines: number;
   label: string;
+  maxFlags: number;
 };
 
 export const DIFFICULTY_CONFIG: Record<Difficulty, DifficultyConfig> = {
-  easy: { rows: 9, cols: 9, mines: 10, label: 'Easy' },
-  medium: { rows: 16, cols: 16, mines: 40, label: 'Medium' },
-  hard: { rows: 16, cols: 30, mines: 99, label: 'Hard' },
+  easy:   { rows: 9,  cols: 9,  mines: 10, label: 'Easy',   maxFlags: 10  },
+  medium: { rows: 16, cols: 16, mines: 40, label: 'Medium',  maxFlags: 50  },
+  hard:   { rows: 16, cols: 30, mines: 99, label: 'Hard',    maxFlags: 100 },
 };
 
 export type GameStatus = 'idle' | 'playing' | 'won' | 'lost';

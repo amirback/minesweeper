@@ -2,28 +2,19 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'MineTrainer — Minesweeper with AI Probability Coach',
-  description:
-    'Play Minesweeper with an AI coach that shows real-time mine probabilities. Train your probabilistic thinking. Daily challenges, global leaderboard.',
+  title: 'Saper — Classic Puzzle',
+  description: 'Классический сапёр с AI-подсказками, рейтингом и ежедневными испытаниями.',
   openGraph: {
-    title: 'MineTrainer',
-    description: 'Minesweeper with AI probability hints. Play smarter, not harder.',
+    title: 'Saper',
+    description: 'Сапёр нового поколения. AI-вероятности, ELO, daily-челлендж.',
     type: 'website',
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: '#0a0b14',
-          color: '#e2e8f0',
-        }}
-      >
+    <html lang="ru">
+      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', color: 'var(--text)' }}>
         {children}
       </body>
     </html>

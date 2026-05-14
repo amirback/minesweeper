@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useGame, MAX_FLAGS } from '@/hooks/useGame';
+import { useGame } from '@/hooks/useGame';
 import { useAuth } from '@/hooks/useAuth';
 import { Board } from '@/components/game/Board';
 import { GameHeader } from '@/components/game/GameHeader';
@@ -15,142 +15,72 @@ import { getDailyDateString } from '@/lib/minesweeper';
 export default function DailyPage() {
   const { user, signOut, signInWithEmail, signUpWithEmail } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
-
   const today = getDailyDateString();
 
   const {
-    board,
-    status,
-    difficulty,
-    flagsPlaced,
-    flagsUsed,
-    timer,
-    showProbability,
-    probabilities,
-    flagMode,
-    minesTotal,
-    dailyCompleted,
-    eloGain,
-    setFlagMode,
-    resetGame,
-    handleCellClick,
-    handleCellRightClick,
-    toggleProbability,
+    board, status, difficulty, flagsPlaced, flagsUsed, timer,
+    showProbability, probabilities, flagMode, minesTotal, maxFlags,
+    dailyCompleted, eloGain,
+    setFlagMode, resetGame, handleCellClick, handleCellRightClick, toggleProbability,
   } = useGame('easy', { mode: 'daily', userId: user?.id });
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavBar user={user} onSignOut={signOut} onOpenAuth={() => setAuthOpen(true)} />
 
-      <main
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '24px 16px 40px',
-          gap: 20,
-        }}
-      >
-        {/* Header */}
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 16px 40px', gap: 20 }}>
         <div style={{ textAlign: 'center' }}>
-          <h1
-            style={{
-              fontSize: 'clamp(20px, 5vw, 28px)',
-              fontWeight: 900,
-              color: '#e2e8f0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              marginBottom: 4,
-            }}
-          >
+          <h1 style={{
+            fontFamily: "'Bebas Neue', Impact, sans-serif",
+            fontSize: 'clamp(28px, 7vw, 40px)', letterSpacing: 4,
+            color: 'var(--text)', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', gap: 10, marginBottom: 4,
+          }}>
             📅 Daily Challenge
           </h1>
-          <p style={{ color: '#64748b', fontSize: 13 }}>
-            {today} · Same board for everyone · Medium difficulty
+          <p style={{ color: 'var(--text-2)', fontSize: 13 }}>
+            {today} · Одна карта для всех · Средняя сложность
           </p>
-          <p style={{ color: '#475569', fontSize: 11, marginTop: 4 }}>
-            New board every day at midnight
+          <p style={{ color: 'var(--text-dim)', fontSize: 11, marginTop: 4 }}>
+            Новая карта каждый день в полночь
           </p>
         </div>
 
-        {/* Game */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: 700,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 14,
-          }}
-        >
+        <div style={{ width: '100%', maxWidth: 700, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
           <GameHeader
-            status={status}
-            timer={timer}
-            flagsPlaced={flagsPlaced}
-            flagsUsed={flagsUsed}
-            minesTotal={minesTotal}
-            maxFlags={MAX_FLAGS}
-            difficulty={difficulty}
-            showProbability={showProbability}
-            flagMode={flagMode}
+            status={status} timer={timer} flagsPlaced={flagsPlaced} flagsUsed={flagsUsed}
+            minesTotal={minesTotal} maxFlags={maxFlags}
+            difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
             mode="daily"
-            onReset={() => {}} // no reset for daily
+            onReset={() => {}}
             onDifficultyChange={() => {}}
             onToggleProbability={toggleProbability}
             onToggleFlagMode={() => setFlagMode(f => !f)}
           />
-
           <Board
-            board={board}
-            probabilities={probabilities}
-            showProbability={showProbability}
-            onCellClick={handleCellClick}
-            onCellRightClick={handleCellRightClick}
+            board={board} probabilities={probabilities} showProbability={showProbability}
+            onCellClick={handleCellClick} onCellRightClick={handleCellRightClick}
             shake={status === 'lost'}
           />
         </div>
 
-        {/* Daily leaderboard */}
         {(dailyCompleted || status === 'won') && (
-          <div
-            style={{
-              width: '100%',
-              maxWidth: 600,
-              marginTop: 8,
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: '#e2e8f0',
-                marginBottom: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              🏆 Today&apos;s Rankings
+          <div style={{ width: '100%', maxWidth: 600, marginTop: 8 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+              🏆 Сегодняшний рейтинг
             </h2>
             <Leaderboard isDaily={true} dailyDate={today} currentUserId={user?.id} />
           </div>
         )}
 
-        <Link href="/" style={{ textDecoration: 'none', marginTop: 8 }}>
-          <span style={{ color: '#475569', fontSize: 13 }}>← Back to free play</span>
+        <Link href="/game" style={{ textDecoration: 'none', marginTop: 8 }}>
+          <span style={{ color: 'var(--text-dim)', fontSize: 13 }}>← Назад к игре</span>
         </Link>
       </main>
 
       <GameOverlay
-        status={status}
-        timer={timer}
-        difficulty={difficulty}
-        mode="daily"
-        eloGain={eloGain}
+        status={status} timer={timer} difficulty={difficulty}
+        mode="daily" eloGain={eloGain}
         onPlayAgain={() => resetGame()}
       />
 

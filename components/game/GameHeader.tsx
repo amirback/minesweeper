@@ -23,150 +23,103 @@ type GameHeaderProps = {
 };
 
 const STATUS_EMOJI: Record<GameStatus, string> = {
-  idle: '😊',
-  playing: '🤔',
-  won: '😎',
-  lost: '😵',
+  idle: '😐', playing: '🤔', won: '😎', lost: '💀',
+};
+
+const DIFF_COLOR: Record<Difficulty, string> = {
+  easy: '#4ca832', medium: '#c8a83a', hard: '#cc4422',
 };
 
 export function GameHeader({
-  status,
-  timer,
-  flagsPlaced,
-  flagsUsed,
-  minesTotal,
-  maxFlags,
-  difficulty,
-  showProbability,
-  flagMode,
-  mode = 'normal',
-  onReset,
-  onDifficultyChange,
-  onToggleProbability,
-  onToggleFlagMode,
+  status, timer, flagsPlaced, flagsUsed, minesTotal, maxFlags,
+  difficulty, showProbability, flagMode, mode = 'normal',
+  onReset, onDifficultyChange, onToggleProbability, onToggleFlagMode,
 }: GameHeaderProps) {
   const remaining = Math.max(0, minesTotal - flagsPlaced);
-  const flagsLeft = maxFlags - flagsUsed;
-  const flagsExhausted = flagsLeft <= 0;
+  const flagsLeft  = maxFlags - flagsUsed;
+  const exhausted  = flagsLeft <= 0;
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+
       {/* Difficulty selector */}
       {mode === 'normal' && (
-        <div className="flex gap-1 justify-center">
+        <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
           {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
-            <button
-              key={d}
-              onClick={() => onDifficultyChange(d)}
-              style={{
-                padding: '4px 14px',
-                borderRadius: 6,
-                fontSize: 13,
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                background: difficulty === d ? '#4f46e5' : '#1e2235',
-                color: difficulty === d ? '#fff' : '#94a3b8',
-                transition: 'all 0.15s',
-              }}
-            >
-              {DIFFICULTY_CONFIG[d].label}
+            <button key={d} onClick={() => onDifficultyChange(d)} style={{
+              padding: '5px 18px', borderRadius: 3, fontSize: 13, fontWeight: 800,
+              border: `2px solid ${difficulty === d ? DIFF_COLOR[d] : 'var(--border)'}`,
+              cursor: 'pointer', letterSpacing: 1,
+              background: difficulty === d ? `${DIFF_COLOR[d]}22` : 'var(--bg-card-2)',
+              color: difficulty === d ? DIFF_COLOR[d] : 'var(--text-dim)',
+              transition: 'all 0.15s',
+            }}>
+              {DIFFICULTY_CONFIG[d].label.toUpperCase()}
             </button>
           ))}
         </div>
       )}
 
       {/* Stats row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: '#151728',
-          borderRadius: 8,
-          padding: '8px 12px',
-          gap: 8,
-        }}
-      >
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'var(--bg-card)', border: '1px solid var(--border)',
+        borderRadius: 6, padding: '8px 14px', gap: 8,
+      }}>
         {/* Mine counter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 60 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 64 }}>
           <span style={{ fontSize: 18 }}>💣</span>
-          <span style={{ color: '#f87171', fontWeight: 700, fontSize: 18, fontFamily: 'monospace' }}>
+          <span style={{ color: 'var(--danger)', fontWeight: 800, fontSize: 20, fontFamily: 'monospace', letterSpacing: 1 }}>
             {String(remaining).padStart(3, '0')}
           </span>
         </div>
 
-        {/* Reset button */}
-        <button
-          onClick={onReset}
-          style={{
-            fontSize: 22,
-            background: '#1e2235',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-            padding: '2px 8px',
-            lineHeight: 1,
-            transition: 'transform 0.1s',
-          }}
-          onMouseDown={e => ((e.currentTarget.style.transform = 'scale(0.9)'))}
-          onMouseUp={e => ((e.currentTarget.style.transform = 'scale(1)'))}
-          onMouseLeave={e => ((e.currentTarget.style.transform = 'scale(1)'))}
-          title="New game"
-        >
+        {/* Reset */}
+        <button onClick={onReset} style={{
+          fontSize: 22, background: 'var(--bg-card-2)', border: '1px solid var(--border)',
+          borderRadius: 4, cursor: 'pointer', padding: '2px 10px', lineHeight: 1, transition: 'transform 0.1s',
+        }}
+          onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.88)')}
+          onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+          onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+          title="Новая игра">
           {STATUS_EMOJI[status]}
         </button>
 
         {/* Timer */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 60, justifyContent: 'flex-end' }}>
-          <span style={{ color: '#60a5fa', fontWeight: 700, fontSize: 18, fontFamily: 'monospace' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 64, justifyContent: 'flex-end' }}>
+          <span style={{ color: 'var(--green-hi)', fontWeight: 800, fontSize: 20, fontFamily: 'monospace' }}>
             {formatTime(timer)}
           </span>
-          <span style={{ fontSize: 18 }}>⏱️</span>
+          <span style={{ fontSize: 16 }}>⏱</span>
         </div>
       </div>
 
-      {/* Tool buttons */}
-      <div className="flex gap-2 justify-center flex-wrap">
-        <button
-          onClick={onToggleProbability}
-          style={{
-            padding: '5px 12px',
-            borderRadius: 6,
-            fontSize: 12,
-            fontWeight: 600,
-            border: 'none',
-            cursor: 'pointer',
-            background: showProbability ? '#7c3aed' : '#1e2235',
-            color: showProbability ? '#fff' : '#94a3b8',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            transition: 'all 0.15s',
-          }}
-        >
-          🤖 AI Hints {showProbability ? 'ON' : 'OFF'}
+      {/* Tool row */}
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button onClick={onToggleProbability} style={{
+          padding: '6px 14px', borderRadius: 3, fontSize: 12, fontWeight: 800,
+          border: `1px solid ${showProbability ? 'var(--green)' : 'var(--border)'}`,
+          cursor: 'pointer', letterSpacing: 0.5,
+          background: showProbability ? 'rgba(107,158,53,0.2)' : 'var(--bg-card-2)',
+          color: showProbability ? 'var(--green-hi)' : 'var(--text-2)',
+          transition: 'all 0.15s',
+        }}>
+          🎯 AI-подсказки {showProbability ? 'ВКЛ' : 'ВЫКЛ'}
         </button>
 
-        <button
-          onClick={onToggleFlagMode}
+        <button onClick={onToggleFlagMode}
+          disabled={exhausted}
           style={{
-            padding: '5px 12px',
-            borderRadius: 6,
-            fontSize: 12,
-            fontWeight: 600,
-            border: 'none',
-            cursor: flagsExhausted ? 'not-allowed' : 'pointer',
-            background: flagsExhausted ? '#2a1a1a' : flagMode ? '#dc2626' : '#1e2235',
-            color: flagsExhausted ? '#6b2626' : flagMode ? '#fff' : '#94a3b8',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
+            padding: '6px 14px', borderRadius: 3, fontSize: 12, fontWeight: 800,
+            border: `1px solid ${exhausted ? 'var(--border)' : flagMode ? 'var(--danger)' : 'var(--border)'}`,
+            cursor: exhausted ? 'not-allowed' : 'pointer', letterSpacing: 0.5,
+            background: exhausted ? 'rgba(204,68,34,0.07)' : flagMode ? 'rgba(204,68,34,0.2)' : 'var(--bg-card-2)',
+            color: exhausted ? '#5a3020' : flagMode ? '#ff7755' : 'var(--text-2)',
             transition: 'all 0.15s',
           }}
-          title={flagsExhausted ? 'No flags left this game' : 'Toggle flag mode (mobile)'}
-        >
-          🚩 {flagsLeft}/{maxFlags} {flagMode ? 'ON' : 'OFF'}
+          title={exhausted ? 'Флаги закончились' : 'Режим флага (мобайл)'}>
+          🚩 {flagsLeft}/{maxFlags} {flagMode ? 'ВКЛ' : 'ВЫКЛ'}
         </button>
       </div>
     </div>

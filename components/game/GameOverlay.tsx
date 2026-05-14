@@ -8,7 +8,7 @@ import { getRank } from '@/lib/elo';
 
 const ELO_KEY = 'minetrainer_elo';
 
-type GameOverlayProps = {
+type Props = {
   status: GameStatus;
   timer: number;
   difficulty: Difficulty;
@@ -18,7 +18,7 @@ type GameOverlayProps = {
   onPlayAgain: () => void;
 };
 
-export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGain, combo, onPlayAgain }: GameOverlayProps) {
+export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGain, combo, onPlayAgain }: Props) {
   const [newElo, setNewElo] = useState<number | null>(null);
   const [prevRankName, setPrevRankName] = useState('');
   const [rankUp, setRankUp] = useState(false);
@@ -42,64 +42,72 @@ export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGai
   const { mines } = DIFFICULTY_CONFIG[difficulty];
   const rank = newElo !== null ? getRank(newElo) : null;
 
+  const borderColor = won ? 'var(--green)' : 'var(--danger)';
+  const glow = won ? 'rgba(107,158,53,0.4)' : 'rgba(204,68,34,0.4)';
+
   return (
     <div style={{
       position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(6px)', zIndex: 50, padding: 16,
+      background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(8px)', zIndex: 50,
+      padding: 16, overflowY: 'auto',
     }}>
       <div style={{
-        background: '#151728',
-        border: `2px solid ${won ? '#4f46e5' : '#dc2626'}`,
-        borderRadius: 16, padding: '28px 36px', textAlign: 'center',
+        background: 'var(--bg-card)', border: `2px solid ${borderColor}`,
+        borderRadius: 8, padding: '28px 28px 24px', textAlign: 'center',
         maxWidth: 360, width: '100%',
-        boxShadow: `0 0 80px ${won ? 'rgba(79,70,229,0.35)' : 'rgba(220,38,38,0.35)'}`,
+        boxShadow: `0 0 60px ${glow}`,
         animation: 'popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)',
       }}>
         {rankUp && (
           <div style={{
-            background: 'linear-gradient(135deg, #4f46e5, #c084fc)',
-            borderRadius: 8, padding: '8px 12px', marginBottom: 16,
-            fontSize: 13, fontWeight: 700, color: '#fff',
+            background: 'rgba(107,158,53,0.15)', border: '1px solid var(--green)',
+            borderRadius: 6, padding: '8px 12px', marginBottom: 16,
+            fontSize: 13, fontWeight: 800, color: 'var(--green-hi)', letterSpacing: 1,
           }}>
-            🎉 RANK UP! {rank?.icon} {rank?.name}
+            ⬆ НОВЫЙ РАНГ! {rank?.icon} {rank?.name}
           </div>
         )}
 
-        <div style={{ fontSize: 56, marginBottom: 6 }}>{won ? '🎉' : '💥'}</div>
+        <div style={{ fontSize: 52, marginBottom: 6 }}>{won ? '🎉' : '💥'}</div>
 
-        <h2 style={{ fontSize: 26, fontWeight: 800, color: won ? '#818cf8' : '#f87171', marginBottom: 4 }}>
-          {won ? 'You Won!' : 'Game Over'}
+        <h2 style={{
+          fontFamily: "'Bebas Neue', Impact, sans-serif",
+          fontSize: 36, letterSpacing: 4,
+          color: won ? 'var(--green-hi)' : 'var(--danger)', marginBottom: 4,
+        }}>
+          {won ? 'ПОБЕДА!' : 'ПОДРЫВ'}
         </h2>
 
-        <p style={{ color: '#64748b', fontSize: 13, marginBottom: 16 }}>
+        <p style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 16 }}>
           {won
-            ? `Cleared ${mines} mines · ${DIFFICULTY_CONFIG[difficulty].label}`
-            : 'Better luck next time!'}
+            ? `Обезврежено мин: ${mines} · ${DIFFICULTY_CONFIG[difficulty].label}`
+            : 'Попробуй ещё раз!'}
         </p>
 
-        {/* Stats grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: combo && combo >= 2 ? '1fr 1fr 1fr' : '1fr 1fr', gap: 8, marginBottom: 16 }}>
+        {/* Stats */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: combo && combo >= 2 ? '1fr 1fr 1fr' : '1fr 1fr',
+          gap: 8, marginBottom: 16,
+        }}>
           {won && (
-            <div style={{ background: '#0d0f1a', borderRadius: 8, padding: '10px' }}>
-              <div style={{ color: '#64748b', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Time</div>
-              <div style={{ color: '#60a5fa', fontWeight: 700, fontSize: 20, fontFamily: 'monospace' }}>{formatTime(timer)}</div>
+            <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 6, padding: 10 }}>
+              <div style={{ color: 'var(--text-dim)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Время</div>
+              <div style={{ color: 'var(--green-hi)', fontWeight: 800, fontSize: 20, fontFamily: 'monospace' }}>{formatTime(timer)}</div>
             </div>
           )}
           {eloGain !== undefined && eloGain !== null && (
-            <div style={{ background: '#0d0f1a', borderRadius: 8, padding: '10px' }}>
-              <div style={{ color: '#64748b', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>ELO</div>
-              <div style={{
-                fontWeight: 700, fontSize: 20, fontFamily: 'monospace',
-                color: eloGain >= 0 ? '#4ade80' : '#f87171',
-              }}>
+            <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 6, padding: 10 }}>
+              <div style={{ color: 'var(--text-dim)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>ELO</div>
+              <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'monospace', color: eloGain >= 0 ? 'var(--green-hi)' : 'var(--danger)' }}>
                 {eloGain >= 0 ? '+' : ''}{eloGain}
               </div>
             </div>
           )}
           {combo && combo >= 2 && (
-            <div style={{ background: '#0d0f1a', borderRadius: 8, padding: '10px' }}>
-              <div style={{ color: '#64748b', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Best Combo</div>
-              <div style={{ color: '#fbbf24', fontWeight: 700, fontSize: 20, fontFamily: 'monospace' }}>×{combo}</div>
+            <div style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 6, padding: 10 }}>
+              <div style={{ color: 'var(--text-dim)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Комбо</div>
+              <div style={{ color: 'var(--gold)', fontWeight: 800, fontSize: 20, fontFamily: 'monospace' }}>×{combo}</div>
             </div>
           )}
         </div>
@@ -107,30 +115,34 @@ export function GameOverlay({ status, timer, difficulty, mode = 'normal', eloGai
         {rank && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16, fontSize: 13 }}>
             <span>{rank.icon}</span>
-            <span style={{ color: rank.color, fontWeight: 700 }}>{rank.name}</span>
-            <span style={{ color: '#475569', fontFamily: 'monospace' }}>{newElo} ELO</span>
+            <span style={{ color: rank.color, fontWeight: 800 }}>{rank.name}</span>
+            <span style={{ color: 'var(--text-dim)', fontFamily: 'monospace' }}>{newElo} ELO</span>
           </div>
         )}
 
         {mode === 'daily' && won && (
-          <p style={{ color: '#fbbf24', fontSize: 13, marginBottom: 16 }}>⭐ Daily Challenge Complete!</p>
+          <p style={{ color: 'var(--gold)', fontSize: 13, marginBottom: 16, fontWeight: 700 }}>⭐ Daily Challenge выполнен!</p>
         )}
 
         {(mode !== 'daily' || !won) && (
-          <button onClick={onPlayAgain}
-            style={{
-              background: won ? '#4f46e5' : '#1e2235', color: '#fff', border: 'none',
-              borderRadius: 8, padding: '10px 28px', fontSize: 15, fontWeight: 700,
-              cursor: 'pointer', width: '100%', transition: 'opacity 0.15s',
-            }}
+          <button onClick={onPlayAgain} style={{
+            background: won ? 'var(--green)' : 'var(--bg-card-2)',
+            color: won ? '#0b1a08' : 'var(--text)',
+            border: won ? 'none' : '1px solid var(--border)',
+            borderRadius: 4, padding: '14px 28px', fontSize: 16, fontWeight: 800,
+            cursor: 'pointer', width: '100%', letterSpacing: 2,
+            fontFamily: "'Bebas Neue', Impact, sans-serif",
+            minHeight: 52,
+            transition: 'opacity 0.15s',
+          }}
             onMouseOver={e => (e.currentTarget.style.opacity = '0.85')}
             onMouseOut={e => (e.currentTarget.style.opacity = '1')}>
-            {won ? '🔄 Play Again' : '🔄 Try Again'}
+            {won ? 'ИГРАТЬ ЕЩЁ' : 'СНОВА В БОЙ'}
           </button>
         )}
 
         {mode === 'daily' && won && (
-          <p style={{ color: '#475569', fontSize: 12, marginTop: 8 }}>New board tomorrow!</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 8 }}>Новая карта завтра</p>
         )}
       </div>
     </div>
