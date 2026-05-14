@@ -29,16 +29,18 @@ export default function LeaderboardPage() {
             style={{
               fontSize: 28,
               fontWeight: 900,
-              color: '#e2e8f0',
+              color: 'var(--text)',
               marginBottom: 4,
               display: 'flex',
               alignItems: 'center',
               gap: 8,
+              fontFamily: "'Bebas Neue', Impact, sans-serif",
+              letterSpacing: 3,
             }}
           >
             🏆 Global Leaderboard
           </h1>
-          <p style={{ color: '#64748b', fontSize: 13 }}>
+          <p style={{ color: 'var(--text-2)', fontSize: 13 }}>
             Best times across all difficulty levels
           </p>
         </div>
@@ -46,19 +48,8 @@ export default function LeaderboardPage() {
         <Leaderboard currentUserId={user?.id} />
 
         <div style={{ marginTop: 32, textAlign: 'center' }}>
-          <Link href="/" style={{ textDecoration: 'none' }}>
-            <span
-              style={{
-                color: '#4f46e5',
-                fontWeight: 600,
-                fontSize: 14,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              ← Play to set your best time
-            </span>
+          <Link href="/game" style={{ textDecoration: 'none', color: 'var(--text-dim)', fontSize: 13 }}>
+            ← Back to game
           </Link>
         </div>
       </main>

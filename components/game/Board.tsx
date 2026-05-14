@@ -40,7 +40,7 @@ export function Board({
           display: 'inline-grid',
           gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           gap: '1px',
-          background: '#11132a',
+          background: '#0a1507',
           padding: '3px',
           borderRadius: '6px',
           boxShadow: '0 4px 32px rgba(0,0,0,0.5)',

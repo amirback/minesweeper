@@ -53,10 +53,10 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
 
   if (!isSupabaseConfigured) {
     return (
-      <div style={{ background: '#151728', borderRadius: 12, padding: 24, textAlign: 'center', border: '1px solid #1e2235' }}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: 24, textAlign: 'center', border: '1px solid var(--border)' }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>🔒</div>
-        <h3 style={{ color: '#e2e8f0', fontWeight: 700, marginBottom: 8 }}>Leaderboard Locked</h3>
-        <p style={{ color: '#64748b', fontSize: 13 }}>Connect Supabase to enable global leaderboards!</p>
+        <h3 style={{ color: 'var(--text)', fontWeight: 700, marginBottom: 8 }}>Leaderboard Locked</h3>
+        <p style={{ color: 'var(--text-2)', fontSize: 13 }}>Connect Supabase to enable global leaderboards!</p>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {/* Tab selector */}
-      <div style={{ display: 'flex', background: '#0d0f1a', borderRadius: 8, padding: 3, gap: 2 }}>
+      <div style={{ display: 'flex', background: 'var(--bg)', borderRadius: 8, padding: 3, gap: 2 }}>
         {(['global', 'country'] as Tab[]).map(t => (
           <button
             key={t}
@@ -72,8 +72,8 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
             style={{
               flex: 1, padding: '6px', borderRadius: 6, border: 'none', cursor: 'pointer',
               fontSize: 12, fontWeight: 700,
-              background: tab === t ? '#4f46e5' : 'transparent',
-              color: tab === t ? '#fff' : '#64748b',
+              background: tab === t ? 'var(--green)' : 'transparent',
+              color: tab === t ? '#060c04' : 'var(--text-2)',
               transition: 'all 0.15s',
             }}
           >
@@ -88,8 +88,8 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
             <div style={{ display: 'flex', gap: 4 }}>
               {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
                 <button key={d} onClick={() => setDifficulty(d)}
-                  style={{ padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
-                    background: difficulty === d ? '#4f46e5' : '#1e2235', color: difficulty === d ? '#fff' : '#94a3b8', transition: 'all 0.15s' }}>
+                  style={{ padding: '5px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: '1px solid var(--border)', cursor: 'pointer',
+                    background: difficulty === d ? 'var(--green)' : 'transparent', color: difficulty === d ? '#060c04' : 'var(--text-2)', transition: 'all 0.15s' }}>
                   {DIFFICULTY_CONFIG[d].label}
                 </button>
               ))}
@@ -101,7 +101,7 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
             value={filterCountry}
             onChange={e => setFilterCountry(e.target.value)}
             style={{
-              background: '#1e2235', border: '1px solid #252840', color: '#94a3b8',
+              background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-2)',
               borderRadius: 6, padding: '5px 10px', fontSize: 12, cursor: 'pointer',
             }}
           >
@@ -113,23 +113,23 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 32, color: '#64748b' }}>Loading...</div>
+        <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-dim)' }}>Loading...</div>
       ) : tab === 'country' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {countryStats.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 24, color: '#64748b' }}>No country data yet.</div>
+            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-dim)' }}>No country data yet.</div>
           ) : countryStats.map((cs, i) => (
-            <div key={cs.country} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#151728', borderRadius: 8, padding: '10px 14px', border: '1px solid #1e2235' }}>
+            <div key={cs.country} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)' }}>
               <span style={{ fontSize: 16, minWidth: 24, textAlign: 'center' }}>{i < 3 ? MEDALS[i] : `${i + 1}`}</span>
               <span style={{ fontSize: 18 }}>{COUNTRY_FLAGS[cs.country] ?? '🌍'}</span>
-              <span style={{ flex: 1, color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{cs.country}</span>
-              <span style={{ color: '#4ade80', fontSize: 12, fontWeight: 600 }}>{cs.total_wins} wins</span>
-              <span style={{ color: '#60a5fa', fontFamily: 'monospace', fontSize: 13, fontWeight: 700 }}>{formatTime(Math.round(cs.avg_time))} avg</span>
+              <span style={{ flex: 1, color: 'var(--text)', fontWeight: 600, fontSize: 14 }}>{cs.country}</span>
+              <span style={{ color: 'var(--green-hi)', fontSize: 12, fontWeight: 600 }}>{cs.total_wins} wins</span>
+              <span style={{ color: 'var(--green-hi)', fontFamily: 'monospace', fontSize: 13, fontWeight: 700 }}>{formatTime(Math.round(cs.avg_time))} avg</span>
             </div>
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 32, color: '#64748b', background: '#151728', borderRadius: 12 }}>
+        <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-dim)', background: 'var(--bg-card)', borderRadius: 12 }}>
           No results yet. Be the first! 🏆
         </div>
       ) : (
@@ -137,21 +137,21 @@ export function Leaderboard({ isDaily = false, dailyDate, currentUserId }: Leade
           {entries.map((entry, i) => {
             const rank = entry.elo ? getRank(entry.elo) : null;
             return (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#151728', borderRadius: 8, padding: '10px 14px', border: '1px solid #1e2235' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--bg-card)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 16, minWidth: 24, textAlign: 'center' }}>{i < 3 ? MEDALS[i] : `${i + 1}`}</span>
                 {entry.country && <span style={{ fontSize: 15 }}>{COUNTRY_FLAGS[entry.country] ?? '🌍'}</span>}
                 {entry.user_id ? (
-                  <Link href={`/player/${entry.user_id}`} style={{ flex: 1, color: '#4ade80', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
+                  <Link href={`/player/${entry.user_id}`} style={{ flex: 1, color: 'var(--green-hi)', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
                     onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')}
                     onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}>
                     {entry.username}
                   </Link>
                 ) : (
-                  <span style={{ flex: 1, color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{entry.username}</span>
+                  <span style={{ flex: 1, color: 'var(--text)', fontWeight: 600, fontSize: 14 }}>{entry.username}</span>
                 )}
                 {rank && <span style={{ fontSize: 13 }} title={rank.name}>{rank.icon}</span>}
-                <span style={{ color: '#60a5fa', fontWeight: 700, fontFamily: 'monospace', fontSize: 15 }}>{formatTime(entry.time_seconds)}</span>
-                <span style={{ color: '#475569', fontSize: 11 }}>{new Date(entry.created_at).toLocaleDateString()}</span>
+                <span style={{ color: 'var(--green-hi)', fontWeight: 700, fontFamily: 'monospace', fontSize: 15 }}>{formatTime(entry.time_seconds)}</span>
+                <span style={{ color: 'var(--text-dim)', fontSize: 11 }}>{new Date(entry.created_at).toLocaleDateString()}</span>
               </div>
             );
           })}

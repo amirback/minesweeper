@@ -2,26 +2,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap');
 
 :root {
-  --bg:          #0e1116;
-  --bg-card:     rgba(18,24,28,0.88);
-  --bg-card-2:   rgba(26,31,36,0.85);
-  --border:      rgba(255,255,255,0.07);
-  --border-hi:   rgba(34,197,94,0.45);
+  --bg:          #060c04;
+  --bg-card:     rgba(12,20,8,0.93);
+  --bg-card-2:   rgba(16,26,10,0.90);
+  --border:      rgba(34,197,94,0.12);
+  --border-hi:   rgba(34,197,94,0.42);
   --green:       #22c55e;
   --green-hi:    #4ade80;
   --text:        #f1f5f9;
-  --text-2:      #a1a1aa;
-  --text-dim:    rgba(161,161,170,0.50);
+  --text-2:      #8aaa7a;
+  --text-dim:    rgba(120,160,90,0.55);
   --danger:      #ef4444;
   --gold:        #f59e0b;
-  --cell-un:     #1e2c14;
-  --cell-rev:    #090d07;
+  --cell-un:     #152c0e;
+  --cell-rev:    #060c04;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  background-color: #1a2e10;
+  background-color: #0c1a08;
   background-image: url('/puzzle.svg');
   background-size: 200px 200px;
   background-repeat: repeat;
@@ -29,6 +29,7 @@ html, body {
   font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100%;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 img.emoji {

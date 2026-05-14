@@ -38,10 +38,10 @@ export function StatsPanel({ cloudElo }: { cloudElo?: number }) {
   const winRate  = stats.totalGames > 0 ? Math.round((stats.wins / stats.totalGames) * 100) : 0;
 
   const metrics = [
-    { label: 'Победы',    value: `${winRate}%`,                     color: '#7fc435' },
-    { label: 'Точность',  value: `${accuracy}%`,                    color: '#60d0ff' },
-    { label: 'Ср. время', value: avgTime ? formatTime(avgTime) : '—', color: '#d4b040' },
-    { label: 'Игр',       value: String(stats.totalGames),          color: '#c084fc' },
+    { label: 'Победы',    value: `${winRate}%`,                     color: 'var(--green-hi)' },
+    { label: 'Точность',  value: `${accuracy}%`,                    color: 'var(--text)' },
+    { label: 'Ср. время', value: avgTime ? formatTime(avgTime) : '—', color: 'var(--gold)' },
+    { label: 'Игр',       value: String(stats.totalGames),          color: 'var(--text-2)' },
   ];
 
   return (
@@ -71,7 +71,7 @@ export function StatsPanel({ cloudElo }: { cloudElo?: number }) {
             <div key={d} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px', background: 'var(--bg-card-2)', borderRadius: 5 }}>
               <span style={{ color: '#fff', fontSize: 13, fontWeight: 700 }}>{DIFFICULTY_CONFIG[d].label}</span>
               <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>{wr}%</span>
-              <span style={{ color: '#60d0ff', fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
+              <span style={{ color: 'var(--green-hi)', fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
                 {ds.bestTime ? formatTime(ds.bestTime) : '—'}
               </span>
             </div>

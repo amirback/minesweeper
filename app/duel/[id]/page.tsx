@@ -14,7 +14,7 @@ import {
 } from '@/lib/minesweeper';
 import type { Board } from '@/types/game';
 
-const ROWS = 16, COLS = 16, MINES = 40;
+const ROWS = 13, COLS = 13, MINES = 50;
 
 // ── Mine Placement Grid ───────────────────────────────────────────────────────
 function PlacementGrid({ mines, onToggle }: { mines: Set<string>; onToggle: (r: number, c: number) => void }) {
