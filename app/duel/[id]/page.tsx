@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { NavBar } from '@/components/NavBar';
 import {
@@ -85,8 +86,9 @@ function PlayGrid({ board, onReveal, onFlag }: {
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
-export default function DuelPage({ params }: { params: { id: string } }) {
+export default function DuelPage() {
   const { user, signOut } = useAuth();
+  const params = useParams<{ id: string }>();
   const matchId = params.id;
 
   const [match, setMatch]         = useState<Match | null>(null);

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { NavBar } from '@/components/NavBar';
 import { RankBadge } from '@/components/RankBadge';
 import { AvatarDisplay } from '@/components/Avatars';
@@ -20,8 +21,9 @@ function fmt(sec: number) {
 
 type FriendStatus = 'none' | 'pending_sent' | 'pending_received' | 'accepted' | 'loading' | 'self';
 
-export default function PlayerProfilePage({ params }: { params: { id: string } }) {
+export default function PlayerProfilePage() {
   const { user, signOut } = useAuth();
+  const params = useParams<{ id: string }>();
   const targetId = params.id;
 
   const [profile, setProfile] = useState<{ id: string; username: string; elo: number; country: string; player_id: string } | null>(null);
