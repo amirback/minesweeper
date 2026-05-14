@@ -104,6 +104,7 @@ button { -webkit-user-select:none; user-select:none; }
 
 @media (max-width: 600px) {
   .hide-mobile { display: none !important; }
+  main { padding-bottom: 70px !important; }
 }
 
 @media (max-width: 760px) {
