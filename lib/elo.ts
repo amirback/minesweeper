@@ -7,14 +7,14 @@ export type Rank = {
 };
 
 export const RANKS: Rank[] = [
-  { name: 'Bronze',        icon: '🥉', minElo: 0,    color: '#cd7f32', gradient: 'from-amber-800 to-amber-600' },
-  { name: 'Silver',        icon: '🥈', minElo: 1200, color: '#c0c0c0', gradient: 'from-slate-400 to-slate-300' },
-  { name: 'Gold',          icon: '🥇', minElo: 1500, color: '#ffd700', gradient: 'from-yellow-500 to-yellow-300' },
-  { name: 'Platinum',      icon: '💎', minElo: 1800, color: '#e0e8ff', gradient: 'from-blue-300 to-indigo-200' },
-  { name: 'Diamond',       icon: '💠', minElo: 2100, color: '#7dd3fc', gradient: 'from-cyan-400 to-sky-300' },
-  { name: 'Master',        icon: '🎯', minElo: 2400, color: '#f97316', gradient: 'from-orange-500 to-amber-400' },
-  { name: 'Grandmaster',   icon: '👑', minElo: 2800, color: '#ef4444', gradient: 'from-red-500 to-rose-400' },
-  { name: 'Quantum Miner', icon: '⚛️', minElo: 3200, color: '#a78bfa', gradient: 'from-violet-500 to-purple-400' },
+  { name: 'Bronze',        icon: '▪', minElo: 0,    color: '#4a7a3a', gradient: 'from-green-900 to-green-800' },
+  { name: 'Silver',        icon: '▪', minElo: 1200, color: '#5a9048', gradient: 'from-green-800 to-green-700' },
+  { name: 'Gold',          icon: '▪', minElo: 1500, color: '#6aaa58', gradient: 'from-green-700 to-green-600' },
+  { name: 'Platinum',      icon: '▪', minElo: 1800, color: '#7abe68', gradient: 'from-green-600 to-green-500' },
+  { name: 'Diamond',       icon: '▪', minElo: 2100, color: '#22c55e', gradient: 'from-green-500 to-green-400' },
+  { name: 'Master',        icon: '▲', minElo: 2400, color: '#36d470', gradient: 'from-green-400 to-green-300' },
+  { name: 'Grandmaster',   icon: '▲', minElo: 2800, color: '#4ade80', gradient: 'from-green-300 to-green-200' },
+  { name: 'Quantum Miner', icon: '★', minElo: 3200, color: '#4ade80', gradient: 'from-green-200 to-green-100' },
 ];
 
 export function getRank(elo: number): Rank {

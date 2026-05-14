@@ -25,16 +25,15 @@ export function RankBadge({ elo, showProgress = false, size = 'md' }: RankBadgeP
           gap: 4,
           padding: pad,
           borderRadius: 6,
-          background: 'rgba(255,255,255,0.06)',
-          border: `1px solid ${current.color}44`,
-          boxShadow: `0 0 8px ${current.color}22`,
+          background: 'var(--bg-card-2)',
+          border: `1px solid ${current.color}55`,
         }}
       >
         <span style={{ fontSize: iconSize }}>{current.icon}</span>
         <span style={{ fontSize, fontWeight: 700, color: current.color }}>
           {current.name}
         </span>
-        <span style={{ fontSize: fontSize - 1, color: '#64748b', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: fontSize - 1, color: 'var(--text-dim)', fontFamily: 'monospace' }}>
           {elo}
         </span>
       </div>
@@ -44,7 +43,7 @@ export function RankBadge({ elo, showProgress = false, size = 'md' }: RankBadgeP
           <div
             style={{
               height: 4,
-              background: '#1e2235',
+              background: 'var(--bg-card-2)',
               borderRadius: 2,
               overflow: 'hidden',
             }}
@@ -59,7 +58,7 @@ export function RankBadge({ elo, showProgress = false, size = 'md' }: RankBadgeP
               }}
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#475569' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-dim)' }}>
             <span>{current.name}</span>
             <span>{progress}% → {next.icon} {next.name}</span>
           </div>
