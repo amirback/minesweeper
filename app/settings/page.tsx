@@ -7,6 +7,18 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLang } from '@/contexts/LanguageContext';
 import { LANG_LABELS, type Lang } from '@/lib/i18n';
 import { AVATARS, AvatarDisplay } from '@/components/Avatars';
+import { updateUserCountry, getUserProfile } from '@/lib/supabase';
+
+const COUNTRIES = [
+  { code: 'Kazakhstan', flag: '🇰🇿' }, { code: 'Russia',    flag: '🇷🇺' },
+  { code: 'USA',        flag: '🇺🇸' }, { code: 'Germany',   flag: '🇩🇪' },
+  { code: 'UK',         flag: '🇬🇧' }, { code: 'France',    flag: '🇫🇷' },
+  { code: 'Ukraine',    flag: '🇺🇦' }, { code: 'Turkey',    flag: '🇹🇷' },
+  { code: 'Japan',      flag: '🇯🇵' }, { code: 'Korea',     flag: '🇰🇷' },
+  { code: 'China',      flag: '🇨🇳' }, { code: 'India',     flag: '🇮🇳' },
+  { code: 'Brazil',     flag: '🇧🇷' }, { code: 'Canada',    flag: '🇨🇦' },
+  { code: 'Australia',  flag: '🇦🇺' }, { code: 'Other',     flag: '🌍' },
+];
 
 const AVATAR_KEY = 'saper_avatar';
 
@@ -18,18 +30,28 @@ export default function SettingsPage() {
   const [nickname, setNickname] = useState('');
   const [nickSaving, setNickSaving] = useState(false);
   const [nickMsg, setNickMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [country, setCountry] = useState('');
+  const [countrySaved, setCountrySaved] = useState(false);
 
   useEffect(() => {
     const stored = parseInt(localStorage.getItem(AVATAR_KEY) ?? '0', 10);
     setSelectedAvatar(stored);
   }, []);
 
-  // Load current username when user is logged in
   useEffect(() => {
     if (user) {
       getUsername(user.id).then(name => setNickname(name === 'Player' ? '' : name));
+      getUserProfile(user.id).then(p => { if (p?.country) setCountry(p.country); });
     }
   }, [user]);
+
+  const handleCountrySave = async (selected: string) => {
+    if (!user) return;
+    setCountry(selected);
+    await updateUserCountry(user.id, selected);
+    setCountrySaved(true);
+    setTimeout(() => setCountrySaved(false), 2000);
+  };
 
   const handleSave = () => {
     localStorage.setItem(AVATAR_KEY, String(selectedAvatar));
@@ -180,6 +202,48 @@ export default function SettingsPage() {
             {lang === 'kz' && 'Бұл лақап аты рейтинг пен белсенділікте көрінеді'}
           </p>
         </div>
+
+        {/* ── Country ── */}
+        {user && (
+          <div style={section}>
+            <div style={sTitle}>
+              {lang === 'ru' ? 'Страна' : lang === 'kz' ? 'Ел' : 'Country'}
+            </div>
+            <p style={{ color: 'var(--text-dim)', fontSize: 12, marginBottom: 14 }}>
+              {lang === 'ru' && 'Влияет на позицию в лидерборде по стране'}
+              {lang === 'en' && 'Affects your position in the country leaderboard'}
+              {lang === 'kz' && 'Ел рейтингіндегі орыныңызға әсер етеді'}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              {COUNTRIES.map(c => {
+                const isSelected = country === c.code;
+                return (
+                  <button
+                    key={c.code}
+                    onClick={() => handleCountrySave(c.code)}
+                    style={{
+                      background: isSelected ? 'rgba(74,222,128,0.15)' : 'transparent',
+                      border: `1px solid ${isSelected ? 'var(--green-hi)' : 'var(--border)'}`,
+                      borderRadius: 6, padding: '10px 4px',
+                      cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                      alignItems: 'center', gap: 4, transition: 'all 0.12s',
+                    }}
+                  >
+                    <span style={{ fontSize: 22 }}>{c.flag}</span>
+                    <span style={{ fontSize: 10, color: isSelected ? 'var(--green-hi)' : 'var(--text-dim)', fontWeight: isSelected ? 800 : 600, lineHeight: 1.2, textAlign: 'center' }}>
+                      {c.code}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {countrySaved && (
+              <p style={{ color: 'var(--green-hi)', fontSize: 13, fontWeight: 700, marginTop: 12 }}>
+                {lang === 'ru' ? '✓ Страна сохранена' : lang === 'kz' ? '✓ Ел сақталды' : '✓ Country saved'}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* ── Avatar ── */}
         <div style={section}>
