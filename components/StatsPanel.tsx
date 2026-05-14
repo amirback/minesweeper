@@ -20,11 +20,7 @@ export function updateLocalElo(delta: number) {
   localStorage.setItem(ELO_KEY, String(Math.max(0, current + delta)));
 }
 
-type StatsPanelProps = {
-  cloudElo?: number;
-};
-
-export function StatsPanel({ cloudElo }: StatsPanelProps) {
+export function StatsPanel({ cloudElo }: { cloudElo?: number }) {
   const [stats, setStats] = useState<LocalStats | null>(null);
   const [elo, setElo] = useState(1000);
 
@@ -35,90 +31,47 @@ export function StatsPanel({ cloudElo }: StatsPanelProps) {
 
   if (!stats) return null;
 
-  const accuracy =
-    stats.totalClicks > 0
-      ? Math.round(((stats.totalClicks - stats.mineHits) / stats.totalClicks) * 100)
-      : 100;
+  const accuracy = stats.totalClicks > 0
+    ? Math.round(((stats.totalClicks - stats.mineHits) / stats.totalClicks) * 100)
+    : 100;
+  const avgTime  = stats.wins > 0 ? Math.round(stats.totalTime / stats.wins) : 0;
+  const winRate  = stats.totalGames > 0 ? Math.round((stats.wins / stats.totalGames) * 100) : 0;
 
-  const avgTime =
-    stats.wins > 0 ? Math.round(stats.totalTime / stats.wins) : 0;
-
-  const winRate =
-    stats.totalGames > 0 ? Math.round((stats.wins / stats.totalGames) * 100) : 0;
+  const metrics = [
+    { label: 'Победы',    value: `${winRate}%`,                     color: '#7fc435' },
+    { label: 'Точность',  value: `${accuracy}%`,                    color: '#60d0ff' },
+    { label: 'Ср. время', value: avgTime ? formatTime(avgTime) : '—', color: '#d4b040' },
+    { label: 'Игр',       value: String(stats.totalGames),          color: '#c084fc' },
+  ];
 
   return (
-    <div
-      style={{
-        background: '#151728',
-        border: '1px solid #1e2235',
-        borderRadius: 12,
-        padding: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 14,
-      }}
-    >
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3 style={{ color: '#e2e8f0', fontWeight: 700, fontSize: 15 }}>Your Stats</h3>
+        <h3 style={{ color: '#fff', fontWeight: 800, fontSize: 15, letterSpacing: 0.5 }}>Моя статистика</h3>
         <RankBadge elo={elo} size="sm" />
       </div>
 
       <RankBadge elo={elo} showProgress size="md" />
 
-      {/* Key metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[
-          { label: 'Win Rate',  value: `${winRate}%`,          icon: '🏆', color: '#4ade80' },
-          { label: 'Accuracy',  value: `${accuracy}%`,         icon: '🎯', color: '#60a5fa' },
-          { label: 'Avg Time',  value: avgTime ? formatTime(avgTime) : '—', icon: '⏱️', color: '#fbbf24' },
-          { label: 'Games',     value: String(stats.totalGames), icon: '🎮', color: '#c084fc' },
-        ].map(m => (
-          <div
-            key={m.label}
-            style={{
-              background: '#0d0f1a',
-              borderRadius: 8,
-              padding: '10px 12px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-            }}
-          >
-            <span style={{ fontSize: 11, color: '#475569', display: 'flex', gap: 4 }}>
-              {m.icon} {m.label}
-            </span>
-            <span style={{ fontSize: 20, fontWeight: 800, color: m.color, fontFamily: 'monospace' }}>
-              {m.value}
-            </span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+        {metrics.map(m => (
+          <div key={m.label} style={{ background: 'var(--bg-card-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>{m.label}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: m.color, fontFamily: 'monospace' }}>{m.value}</div>
           </div>
         ))}
       </div>
 
-      {/* By difficulty */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <p style={{ color: '#475569', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
-          Best Times
-        </p>
+        <p style={{ color: 'var(--text-dim)', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 2 }}>Лучшее время</p>
         {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => {
           const ds = stats.byDifficulty[d];
-          const dr = ds.wins > 0 ? Math.round((ds.wins / ds.games) * 100) : 0;
+          const wr = ds.games > 0 ? Math.round((ds.wins / ds.games) * 100) : 0;
           return (
-            <div
-              key={d}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '6px 8px',
-                background: '#0d0f1a',
-                borderRadius: 6,
-              }}
-            >
-              <span style={{ color: '#94a3b8', fontSize: 13, fontWeight: 600 }}>
-                {DIFFICULTY_CONFIG[d].label}
-              </span>
-              <span style={{ color: '#64748b', fontSize: 12 }}>{dr}% wr</span>
-              <span style={{ color: '#60a5fa', fontWeight: 700, fontFamily: 'monospace', fontSize: 14 }}>
+            <div key={d} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 10px', background: 'var(--bg-card-2)', borderRadius: 5 }}>
+              <span style={{ color: '#fff', fontSize: 13, fontWeight: 700 }}>{DIFFICULTY_CONFIG[d].label}</span>
+              <span style={{ color: 'var(--text-dim)', fontSize: 12 }}>{wr}%</span>
+              <span style={{ color: '#60d0ff', fontWeight: 800, fontFamily: 'monospace', fontSize: 14 }}>
                 {ds.bestTime ? formatTime(ds.bestTime) : '—'}
               </span>
             </div>
