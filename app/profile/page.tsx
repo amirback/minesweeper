@@ -157,6 +157,14 @@ export default function ProfilePage() {
                     Публичный профиль
                   </Link>
                 )}
+                <Link href="/friends" style={{
+                  background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border)',
+                  color: 'var(--text-2)', borderRadius: 6, padding: '8px 16px',
+                  fontSize: 13, fontWeight: 700, textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                  {lang === 'ru' ? '👥 Друзья' : lang === 'kz' ? '👥 Достар' : '👥 Friends'}
+                </Link>
                 <button onClick={signOut} style={{
                   background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
                   color: '#ef4444', borderRadius: 6, padding: '8px 16px',
