@@ -16,9 +16,9 @@ Keep responses concise, max 3-4 sentences unless asked for more.
 Respond in the same language the user writes in (Russian or English).`;
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: 'AI not configured' }, { status: 500 });
+    return NextResponse.json({ error: 'AI not configured — add GROQ_API_KEY to Vercel env vars' }, { status: 500 });
   }
 
   const { message, stats } = await req.json();
@@ -28,25 +28,26 @@ export async function POST(req: NextRequest) {
     ? `\n\nPlayer stats: ${JSON.stringify(stats)}`
     : '';
 
-  const prompt = `${SYSTEM_PROMPT}${statsContext}\n\nUser: ${message}`;
-
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 400, temperature: 0.7 },
-        }),
-      }
-    );
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT + statsContext },
+          { role: 'user',   content: message },
+        ],
+        max_tokens: 400,
+        temperature: 0.7,
+      }),
+    });
 
     const data = await res.json();
-    console.log('Gemini response:', JSON.stringify(data).slice(0, 500));
-
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const reply = data?.choices?.[0]?.message?.content;
     if (!reply) {
       const errMsg = data?.error?.message ?? JSON.stringify(data).slice(0, 200);
       return NextResponse.json({ error: errMsg }, { status: 500 });
@@ -54,7 +55,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ reply });
   } catch (e) {
-    console.error('AI error:', e);
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }

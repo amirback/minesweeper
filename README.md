@@ -29,13 +29,13 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-## connect free ai (gemini)
+## connect free ai (groq)
 
-1. go to [aistudio.google.com](https://aistudio.google.com) → get api key (free, no credit card)
-2. add to vercel: project → settings → environment variables → `GEMINI_API_KEY` = your key
+1. go to [groq.com](https://groq.com) → sign up → api keys → create key (free, no credit card)
+2. add to vercel: project → settings → environment variables → `GROQ_API_KEY` = your key
 3. redeploy → ai tab works
 
-free tier: 1500 requests/day, 15 req/min. more than enough.
+free tier: 6000 tokens/min, no daily limit. runs llama 3.1.
 
 ## play it
 
