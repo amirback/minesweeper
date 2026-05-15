@@ -1,47 +1,43 @@
-# 💣 SAPER — Classic Puzzle
+# saper
 
-Built this because I was tired of playing minesweeper like a caveman with no information. Now there's an AI that tells you which cells are probably going to kill you.
+built this because i was tired of playing minesweeper like a caveman with no information. now there's an ai that tells you which cells are probably going to kill you.
 
----
+## what it does
 
-## What it does
+- **classic minesweeper** - 3 difficulties (easy / medium / hard)
+- **ai probability coach** - press one button and every unrevealed cell shows % chance of mine. green = safe-ish. red = don't click that
+- **flag limit per game** - easy: 10 flags, medium: 50, hard: 100. you can't flag everything, you actually have to think
+- **elo ranking system** - 8 ranks from novice to quantum miner. win fast = more points. lose = cry
+- **combo streaks** - click multiple safe cells in a row fast enough and you get a combo multiplier
+- **daily challenge** - same board for everyone every day. compare your time with the world
+- **leaderboard** - global ranking, see who's actually good at this
+- **paratrooper animation** - plant a flag and a soldier parachutes in. if it's a mine he dies. if not, he vibes
 
-- **Classic minesweeper** — 3 difficulties (Easy / Medium / Hard)
-- **AI probability coach** — press one button and every unrevealed cell shows % chance of mine. Green = safe-ish. Red = don't click that
-- **Flag limit per game** — Easy: 10 flags, Medium: 50, Hard: 100. You can't flag everything, you actually have to think
-- **ELO ranking system** — 8 ranks from Novice to Quantum Miner. Win fast = more points. Lose = cry
-- **Combo streaks** — click multiple safe cells in a row fast enough and you get a combo multiplier
-- **Daily Challenge** — same board for everyone every day. Compare your time with the world
-- **Leaderboard** — global ranking, see who's actually good at this
-- **Paratrooper animation** — plant a flag and a soldier parachutes in. If it's a mine he dies. If not, he vibes
+## tech
 
----
+next.js 15 / typescript / supabase (auth + db) / web audio api (all sounds synthesized, no audio files) / vercel
 
-## Tech
-
-Next.js 15 · TypeScript · Supabase (auth + DB) · Web Audio API (all sounds synthesized, no audio files) · Vercel
-
----
-
-## Run locally
+## run locally
 
 ```bash
-git clone https://github.com/amirback/minesweeper1
-cd minesweeper1
+git clone https://github.com/amirback/minesweeper
+cd minesweeper
 npm install
 cp .env.local.example .env.local
-# fill in your Supabase keys
+# fill in your supabase keys
 npm run dev
 ```
 
----
+## play it
 
-## Play it
+https://saper.ink
 
-https://minesweeper-nine-sigma.vercel.app
-
-No install needed. Works on mobile too (desktop recommended for Hard mode — 30 columns on a phone is pain).
+no install needed. works on mobile too (desktop recommended for hard mode).
 
 ---
 
-Made for nFactorial Incubator application.
+<div align="center">
+  <img src="public/nfactorial.svg" alt="nFactorial" width="60"/>
+  <br/>
+  made for nfactorial incubator
+</div>
