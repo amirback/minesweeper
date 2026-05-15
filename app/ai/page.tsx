@@ -75,7 +75,7 @@ export default function AIPage() {
           }}>
             AI ASSISTANT
           </div>
-          <span style={{ color: 'var(--text-2)', fontSize: 13 }}>powered by Gemini</span>
+          <span style={{ color: 'var(--text-2)', fontSize: 13 }}>powered by Groq · llama 3.1</span>
         </div>
 
         {/* Quick actions */}
