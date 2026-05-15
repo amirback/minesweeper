@@ -197,8 +197,17 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
       if (status === 'idle') {
         if (mode === 'daily') {
+          const centerRow = Math.floor(rows / 2);
+          const centerCol = Math.floor(cols / 2);
+          currentBoard = revealCell(board, centerRow, centerCol, rows, cols);
           setStatus('playing');
           startTimeRef.current = Date.now();
+          if (checkWin(currentBoard)) {
+            setBoard(currentBoard); setStatus('won'); sounds.victory(); handleGameEnd(true, 0);
+            return;
+          }
+          setBoard(currentBoard);
+          return;
         } else {
           currentBoard = placeMines(board, rows, cols, mines, row, col);
           setStatus('playing');
