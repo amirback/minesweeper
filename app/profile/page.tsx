@@ -157,6 +157,14 @@ export default function ProfilePage() {
                     Публичный профиль
                   </Link>
                 )}
+                <button onClick={signOut} style={{
+                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)',
+                  color: '#ef4444', borderRadius: 6, padding: '8px 16px',
+                  fontSize: 13, fontWeight: 800, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                  {lang === 'ru' ? 'Выйти' : lang === 'kz' ? 'Шығу' : 'Sign Out'}
+                </button>
               </div>
             </div>
 
