@@ -199,10 +199,24 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
         if (mode === 'daily') {
           const centerRow = Math.floor(rows / 2);
           const centerCol = Math.floor(cols / 2);
+
+          const totalCells = rows * cols;
+          const mineCount = board.flat().filter(c => c.isMine).length;
+          const alreadyRevealed = board.flat().filter(c => c.isRevealed).length;
+          console.log('[DAILY] First click. Status:', status, 'Clicked:', row, col, 'Center:', centerRow, centerCol);
+          console.log('[DAILY] Board state — total:', totalCells, 'mines:', mineCount, 'alreadyRevealed:', alreadyRevealed);
+
           currentBoard = revealCell(board, centerRow, centerCol, rows, cols);
+
+          const afterReveal = currentBoard.flat().filter(c => c.isRevealed).length;
+          const safeCells = totalCells - mineCount;
+          console.log('[DAILY] After revealCell — revealed:', afterReveal, '/', safeCells, 'safe cells');
+          console.log('[DAILY] checkWin result:', checkWin(currentBoard));
+
           setStatus('playing');
           startTimeRef.current = Date.now();
           if (checkWin(currentBoard)) {
+            console.log('[DAILY] ⚠️ WIN TRIGGERED at first click! revealed:', afterReveal, 'safeCells:', safeCells);
             setBoard(currentBoard); setStatus('won'); sounds.victory(); handleGameEnd(true, 0);
             return;
           }
