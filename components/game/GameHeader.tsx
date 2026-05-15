@@ -49,9 +49,9 @@ export function GameHeader({
         <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
           {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
             <button key={d} onClick={() => onDifficultyChange(d)} style={{
-              padding: '5px 18px', borderRadius: 3, fontSize: 13, fontWeight: 800,
+              padding: '5px 12px', borderRadius: 3, fontSize: 12, fontWeight: 800,
               border: `2px solid ${difficulty === d ? DIFF_COLOR[d] : 'var(--border)'}`,
-              cursor: 'pointer', letterSpacing: 1,
+              cursor: 'pointer', letterSpacing: 0.5, flex: 1, maxWidth: 100,
               background: difficulty === d ? `${DIFF_COLOR[d]}22` : 'var(--bg-card-2)',
               color: difficulty === d ? DIFF_COLOR[d] : 'var(--text-dim)',
               transition: 'all 0.15s',
@@ -97,14 +97,14 @@ export function GameHeader({
       </div>
 
       {/* Tool row */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
         <button onClick={onToggleProbability} style={{
-          padding: '6px 14px', borderRadius: 3, fontSize: 12, fontWeight: 800,
+          padding: '6px 10px', borderRadius: 3, fontSize: 11, fontWeight: 800,
           border: `1px solid ${showProbability ? 'var(--green)' : 'var(--border)'}`,
-          cursor: 'pointer', letterSpacing: 0.5,
+          cursor: 'pointer', letterSpacing: 0.3, flex: 1,
           background: showProbability ? 'rgba(107,158,53,0.2)' : 'var(--bg-card-2)',
           color: showProbability ? 'var(--green-hi)' : 'var(--text-2)',
-          transition: 'all 0.15s',
+          transition: 'all 0.15s', whiteSpace: 'nowrap',
         }}>
           {tr.aiHints} {showProbability ? tr.on : tr.off}
         </button>
@@ -112,12 +112,12 @@ export function GameHeader({
         <button onClick={onToggleFlagMode}
           disabled={exhausted}
           style={{
-            padding: '6px 14px', borderRadius: 3, fontSize: 12, fontWeight: 800,
+            padding: '6px 10px', borderRadius: 3, fontSize: 11, fontWeight: 800,
             border: `1px solid ${exhausted ? 'var(--border)' : flagMode ? 'var(--danger)' : 'var(--border)'}`,
-            cursor: exhausted ? 'not-allowed' : 'pointer', letterSpacing: 0.5,
+            cursor: exhausted ? 'not-allowed' : 'pointer', letterSpacing: 0.3, flex: 1,
             background: exhausted ? 'rgba(204,68,34,0.07)' : flagMode ? 'rgba(204,68,34,0.2)' : 'var(--bg-card-2)',
             color: exhausted ? '#5a3020' : flagMode ? '#ff7755' : 'var(--text-2)',
-            transition: 'all 0.15s',
+            transition: 'all 0.15s', whiteSpace: 'nowrap',
           }}
           title={exhausted ? 'Флаги закончились' : 'Режим флага (мобайл)'}>
           🚩 {flagsLeft}/{maxFlags} {flagMode ? 'ВКЛ' : 'ВЫКЛ'}

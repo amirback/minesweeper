@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Board as BoardType } from '@/types/game';
 import type { ProbabilityMap } from '@/lib/probability';
 import { Cell } from './Cell';
@@ -14,10 +14,29 @@ type BoardProps = {
   shake?: boolean;
 };
 
-function getCellSize(cols: number): number {
-  if (cols <= 9) return 44;
+function getIdealCellSize(cols: number): number {
+  if (cols <= 9)  return 44;
   if (cols <= 16) return 36;
   return 30;
+}
+
+function useCellSize(cols: number): number {
+  const [size, setSize] = useState(() => getIdealCellSize(cols));
+
+  useEffect(() => {
+    const compute = () => {
+      const vw = window.innerWidth;
+      const available = vw - 40;
+      const ideal = getIdealCellSize(cols);
+      const fitted = Math.floor(available / cols);
+      setSize(Math.max(Math.min(ideal, fitted), 22));
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, [cols]);
+
+  return size;
 }
 
 export function Board({
@@ -31,10 +50,10 @@ export function Board({
   if (board.length === 0) return null;
 
   const cols = board[0].length;
-  const cellSize = getCellSize(cols);
+  const cellSize = useCellSize(cols);
 
   return (
-    <div className="overflow-auto max-w-full" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div style={{ overflowX: 'auto', maxWidth: '100%', WebkitOverflowScrolling: 'touch' as never }}>
       <div
         style={{
           display: 'inline-grid',

@@ -107,8 +107,25 @@ button { -webkit-user-select:none; user-select:none; }
 @media (max-width: 600px) {
   .hide-mobile { display: none !important; }
   main { padding-bottom: 70px !important; }
+
+  /* Game page */
+  main { padding-left: 8px !important; padding-right: 8px !important; }
+
+  /* Overlays */
+  [data-overlay] { padding: 12px !important; }
 }
 
 @media (max-width: 760px) {
   .game-sidebar { display: none !important; }
+}
+
+/* Prevent text size inflation on iOS */
+html { -webkit-text-size-adjust: 100%; }
+
+/* Smooth scrolling for board overflow */
+.board-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Touch targets min 44px */
+@media (max-width: 600px) {
+  button { min-height: 36px; }
 }
