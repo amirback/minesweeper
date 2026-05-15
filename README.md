@@ -1,18 +1,21 @@
 # saper
 
-built this because i was tired of playing minesweeper like a caveman with no information. now there's an ai that tells you which cells are probably going to kill you.
+built this because i was tired of playing minesweeper like a caveman with no information. now there's a probability overlay that tells you which cells are probably going to kill you.
 
 ## what it does
 
 - **classic minesweeper** - 3 difficulties (easy / medium / hard)
-- **ai probability coach** - press one button and every unrevealed cell shows % chance of mine. green = safe-ish. red = don't click that
+- **probability coach** - press one button and every unrevealed cell shows % chance of mine. green = safe-ish. red = don't click that
 - **flag limit per game** - easy: 10 flags, medium: 50, hard: 100. you can't flag everything, you actually have to think
 - **elo ranking system** - 8 ranks from novice to quantum miner. win fast = more points. lose = cry
 - **combo streaks** - click multiple safe cells in a row fast enough and you get a combo multiplier
 - **daily challenge** - same board for everyone every day. compare your time with the world
 - **leaderboard** - global ranking, see who's actually good at this
 - **paratrooper animation** - plant a flag and a soldier parachutes in. if it's a mine he dies. if not, he vibes
-- **ai assistant** - added an ai chat that analyzes your games and explains strategy. does a minesweeper game need an ai assistant? probably not. did i add one anyway to show i could? absolutely.
+
+## you didn't ask for this, but here it is
+
+added a chat coach (the red ✦ Coach tab) that reads your game stats and explains strategy, helps with 50/50 situations, and gives personalized tips. does a minesweeper game need a built-in chat coach? probably not. is it here anyway? yes. powered by llama 3.1 via groq — free, no credit card.
 
 ## tech
 
@@ -28,14 +31,6 @@ cp .env.local.example .env.local
 # fill in your supabase keys
 npm run dev
 ```
-
-## connect free ai (groq)
-
-1. go to [groq.com](https://groq.com) → sign up → api keys → create key (free, no credit card)
-2. add to vercel: project → settings → environment variables → `GROQ_API_KEY` = your key
-3. redeploy → ai tab works
-
-free tier: 6000 tokens/min, no daily limit. runs llama 3.1.
 
 ## play it
 

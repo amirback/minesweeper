@@ -22,7 +22,7 @@ const SHORT: Record<string, Record<Lang, string>> = {
   '/profile':     { en: 'Profile', ru: 'Профиль', kz: 'Профиль' },
   '/friends':     { en: 'Friends', ru: 'Друзья',  kz: 'Достар' },
   '/settings':    { en: 'Set.',    ru: 'Настр.',  kz: 'Баптау' },
-  '/ai':          { en: '✦ AI',    ru: '✦ AI',    kz: '✦ AI' },
+  '/ai':          { en: '✦ Coach', ru: '✦ Коуч',  kz: '✦ Коуч' },
 };
 
 const BOTTOM_LINKS = ['/daily', '/leaderboard', '/stats', '/profile', '/friends', '/ai'];
@@ -95,15 +95,14 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
           <Link href="/settings"    style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.settings}</Link>
           <Link href="/ai" style={{
             background: pathname === '/ai' ? '#ef4444' : 'rgba(239,68,68,0.12)',
-            color: '#ef4444', fontSize: 12, fontWeight: 800,
+            color: pathname === '/ai' ? '#fff' : '#ef4444', fontSize: 12, fontWeight: 800,
             padding: '4px 10px', borderRadius: 4,
             display: 'flex', alignItems: 'center', gap: 4,
             textDecoration: 'none', letterSpacing: 1,
             border: '1px solid rgba(239,68,68,0.35)',
             whiteSpace: 'nowrap',
-            ...(pathname === '/ai' ? { color: '#fff' } : {}),
           }}>
-            ✦ AI
+            ✦ Coach
           </Link>
         </div>
 
