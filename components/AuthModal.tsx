@@ -70,11 +70,11 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
       try {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: typeof window !== 'undefined'
-            ? `${window.location.origin}/settings`
-            : '/settings',
+            ? `${window.location.origin}/auth/reset`
+            : 'https://saper.ink/auth/reset',
         });
         if (error) throw error;
-        setSuccess('Ссылка для сброса пароля отправлена — проверьте почту');
+        setSuccess('Ссылка отправлена — проверьте почту (и папку Спам)');
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Ошибка отправки');
       } finally {
