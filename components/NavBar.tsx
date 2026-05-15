@@ -25,7 +25,7 @@ const SHORT: Record<string, Record<Lang, string>> = {
   '/ai':          { en: '✦ Coach', ru: '✦ Коуч',  kz: '✦ Коуч' },
 };
 
-const BOTTOM_LINKS = ['/daily', '/leaderboard', '/stats', '/profile', '/friends', '/ai'];
+const BOTTOM_LINKS = ['/daily', '/leaderboard', '/stats', '/profile', '/settings', '/ai'];
 
 type NavBarProps = {
   user: User | null;
