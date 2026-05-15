@@ -18,15 +18,25 @@ import { createMatch } from '@/lib/supabase';
 import { getUserProfile } from '@/lib/supabase';
 import type { Difficulty } from '@/types/game';
 
-type GameAreaProps = { userId?: string; onPlayAgain: () => void };
+type GameAreaProps = {
+  userId?: string;
+  initialDifficulty: Difficulty;
+  onPlayAgain: () => void;
+  onDifficultyChange: (d: Difficulty) => void;
+};
 
-function GameArea({ userId, onPlayAgain }: GameAreaProps) {
+function GameArea({ userId, initialDifficulty, onPlayAgain, onDifficultyChange }: GameAreaProps) {
   const {
     board, status, difficulty, flagsPlaced, flagsUsed, timer,
     showProbability, probabilities, flagMode, minesTotal, maxFlags,
     combo, eloGain, flagEvent,
     setFlagMode, resetGame, handleCellClick, handleCellRightClick, toggleProbability,
-  } = useGame('easy', { userId });
+  } = useGame(initialDifficulty, { userId });
+
+  const handleDifficultyChange = (d: Difficulty) => {
+    resetGame(d);
+    onDifficultyChange(d);
+  };
 
   return (
     <>
@@ -36,7 +46,7 @@ function GameArea({ userId, onPlayAgain }: GameAreaProps) {
           minesTotal={minesTotal} maxFlags={maxFlags}
           difficulty={difficulty} showProbability={showProbability} flagMode={flagMode}
           onReset={() => resetGame()}
-          onDifficultyChange={(d: Difficulty) => resetGame(d)}
+          onDifficultyChange={handleDifficultyChange}
           onToggleProbability={toggleProbability}
           onToggleFlagMode={() => setFlagMode(f => !f)}
         />
@@ -74,6 +84,7 @@ export default function GamePage() {
   const { user, signOut, signInWithEmail, signUpWithEmail } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>('easy');
   const [creating, setCreating] = useState(false);
   const router = useRouter();
 
@@ -95,7 +106,6 @@ export default function GamePage() {
         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
         padding: '16px 12px 40px', gap: 16,
       }}>
-        {/* Two-column: game + sidebar */}
         <div style={{
           width: '100%', maxWidth: 1100,
           display: 'flex', gap: 20, alignItems: 'flex-start',
@@ -104,6 +114,8 @@ export default function GamePage() {
           <GameArea
             key={gameKey}
             userId={user?.id}
+            initialDifficulty={currentDifficulty}
+            onDifficultyChange={setCurrentDifficulty}
             onPlayAgain={() => setGameKey(k => k + 1)}
           />
 
@@ -112,7 +124,6 @@ export default function GamePage() {
             display: 'flex', flexDirection: 'column', gap: 16,
             width: 260, flexShrink: 0,
           }}>
-            {/* Create Match */}
             <button
               onClick={handleCreateMatch}
               disabled={creating}
