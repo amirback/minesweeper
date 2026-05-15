@@ -17,6 +17,43 @@ import { StatsPanel } from '@/components/StatsPanel';
 import { createMatch } from '@/lib/supabase';
 import { getUserProfile } from '@/lib/supabase';
 import type { Difficulty } from '@/types/game';
+import { useLang } from '@/contexts/LanguageContext';
+
+const AD_TEXT: Record<string, string> = {
+  en: 'Your ad\ncould be\nhere',
+  ru: 'Здесь\nмогла бы\nбыть ваша\nреклама',
+  kz: 'Мұнда\nсіздің\nжарнамаңыз\nболуы мүмкін',
+};
+
+function AdPlaceholder() {
+  const { lang } = useLang();
+  const text = AD_TEXT[lang] ?? AD_TEXT.en;
+  return (
+    <div className="hide-mobile" style={{
+      width: 90, flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      alignSelf: 'stretch',
+    }}>
+      <div style={{
+        border: '1px dashed var(--border)',
+        borderRadius: 8,
+        padding: '16px 8px',
+        color: 'var(--text-dim)',
+        fontSize: 10, fontWeight: 600,
+        textAlign: 'center', lineHeight: 1.6,
+        letterSpacing: 0.3,
+        whiteSpace: 'pre-line',
+        opacity: 0.5,
+        writingMode: 'vertical-rl',
+        textOrientation: 'mixed',
+        transform: 'rotate(180deg)',
+        height: 160,
+      }}>
+        {text}
+      </div>
+    </div>
+  );
+}
 
 type GameAreaProps = {
   userId?: string;
@@ -107,10 +144,16 @@ export default function GamePage() {
         padding: '16px 12px 40px', gap: 16,
       }}>
         <div style={{
-          width: '100%', maxWidth: 1100,
-          display: 'flex', gap: 20, alignItems: 'flex-start',
-          flexWrap: 'wrap', justifyContent: 'center',
+          width: '100%', maxWidth: 1300,
+          display: 'flex', gap: 8, alignItems: 'flex-start',
+          justifyContent: 'center',
         }}>
+          <AdPlaceholder />
+          <div style={{
+            flex: 1, maxWidth: 1100,
+            display: 'flex', gap: 20, alignItems: 'flex-start',
+            flexWrap: 'wrap', justifyContent: 'center',
+          }}>
           <GameArea
             key={gameKey}
             userId={user?.id}
@@ -165,6 +208,8 @@ export default function GamePage() {
               <LiveFeed />
             </div>
           </div>
+          </div>
+          <AdPlaceholder />
         </div>
       </main>
 
