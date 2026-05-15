@@ -92,6 +92,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   const timerRef       = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastSafeClickRef = useRef<number>(0);
   const comboRef         = useRef(0);
+  const dailyFirstClickDoneRef = useRef(false);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -140,6 +141,7 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     startTimeRef.current = null;
     comboRef.current = 0;
     lastSafeClickRef.current = 0;
+    dailyFirstClickDoneRef.current = false;
     setProbabilities(new Map());
   }, [difficulty, mode]);
 
@@ -197,26 +199,17 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
 
       if (status === 'idle') {
         if (mode === 'daily') {
+          if (dailyFirstClickDoneRef.current) return;
+          dailyFirstClickDoneRef.current = true;
+
           const centerRow = Math.floor(rows / 2);
           const centerCol = Math.floor(cols / 2);
 
-          const totalCells = rows * cols;
-          const mineCount = board.flat().filter(c => c.isMine).length;
-          const alreadyRevealed = board.flat().filter(c => c.isRevealed).length;
-          console.log('[DAILY] First click. Status:', status, 'Clicked:', row, col, 'Center:', centerRow, centerCol);
-          console.log('[DAILY] Board state — total:', totalCells, 'mines:', mineCount, 'alreadyRevealed:', alreadyRevealed);
-
           currentBoard = revealCell(board, centerRow, centerCol, rows, cols);
-
-          const afterReveal = currentBoard.flat().filter(c => c.isRevealed).length;
-          const safeCells = totalCells - mineCount;
-          console.log('[DAILY] After revealCell — revealed:', afterReveal, '/', safeCells, 'safe cells');
-          console.log('[DAILY] checkWin result:', checkWin(currentBoard));
 
           setStatus('playing');
           startTimeRef.current = Date.now();
           if (checkWin(currentBoard)) {
-            console.log('[DAILY] ⚠️ WIN TRIGGERED at first click! revealed:', afterReveal, 'safeCells:', safeCells);
             setBoard(currentBoard); setStatus('won'); sounds.victory(); handleGameEnd(true, 0);
             return;
           }
