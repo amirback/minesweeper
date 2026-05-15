@@ -44,11 +44,17 @@ export async function POST(req: NextRequest) {
     );
 
     const data = await res.json();
+    console.log('Gemini response:', JSON.stringify(data).slice(0, 500));
+
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!reply) return NextResponse.json({ error: 'No response from AI' }, { status: 500 });
+    if (!reply) {
+      const errMsg = data?.error?.message ?? JSON.stringify(data).slice(0, 200);
+      return NextResponse.json({ error: errMsg }, { status: 500 });
+    }
 
     return NextResponse.json({ reply });
-  } catch {
-    return NextResponse.json({ error: 'AI request failed' }, { status: 500 });
+  } catch (e) {
+    console.error('AI error:', e);
+    return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }
