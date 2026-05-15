@@ -10,6 +10,7 @@ import { AvatarDisplay } from './Avatars';
 import { sounds } from '@/lib/sounds';
 import { useLang } from '@/contexts/LanguageContext';
 import type { Lang } from '@/lib/i18n';
+import { ProModal } from './ProModal';
 
 const ELO_KEY    = 'minetrainer_elo';
 const AVATAR_KEY = 'saper_avatar';
@@ -39,6 +40,7 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
   const [elo, setElo]       = useState(1000);
   const [muted, setMuted]   = useState(false);
   const [avatarId, setAvatarId] = useState(0);
+  const [proOpen, setProOpen] = useState(false);
 
   useEffect(() => {
     if (cloudElo !== undefined) setElo(cloudElo);
@@ -111,6 +113,17 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
             <RankBadge elo={elo} size="sm" />
           </div>
 
+          <button onClick={() => setProOpen(true)} style={{
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            border: 'none', borderRadius: 4, padding: '5px 12px',
+            color: '#000', fontSize: 12, fontWeight: 900,
+            cursor: 'pointer', letterSpacing: 1,
+            fontFamily: "'Bebas Neue', Impact, sans-serif",
+            whiteSpace: 'nowrap',
+          }}>
+            ⚡ PRO
+          </button>
+
           <button
             onClick={() => { const m = sounds.toggle(); setMuted(m); }}
             style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16, padding: '2px 4px', opacity: muted ? 0.35 : 1 }}
@@ -170,6 +183,8 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
           .mobile-bottom-nav { display: flex !important; }
         }
       `}</style>
+
+      {proOpen && <ProModal onClose={() => setProOpen(false)} />}
     </>
   );
 }
