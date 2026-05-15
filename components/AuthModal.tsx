@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 type AuthModalProps = {
@@ -32,6 +32,22 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
   const [error, setError]        = useState('');
   const [loading, setLoading]    = useState(false);
   const [success, setSuccess]    = useState('');
+  const [cooldown, setCooldown]  = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => { if (cooldownRef.current) clearInterval(cooldownRef.current); };
+  }, []);
+
+  const startCooldown = () => {
+    setCooldown(120);
+    cooldownRef.current = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(cooldownRef.current!); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   const strength = mode === 'signup' ? passwordStrength(password) : null;
 
@@ -79,7 +95,11 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
         setSuccess('Проверьте почту — мы отправили ссылку для подтверждения');
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Что-то пошло не так');
+      const msg = err instanceof Error ? err.message : 'Что-то пошло не так';
+      setError(msg);
+      if (msg.toLowerCase().includes('много попыток') || msg.toLowerCase().includes('rate limit')) {
+        startCooldown();
+      }
     } finally {
       setLoading(false);
     }
@@ -158,17 +178,22 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
             {error && (
               <div style={{ background: 'rgba(224,68,34,0.15)', border: '1px solid var(--danger)', borderRadius: 4, padding: '8px 12px', fontSize: 13, color: '#ff9977', textAlign: 'center' }}>
                 {error}
+                {cooldown > 0 && (
+                  <div style={{ marginTop: 4, fontWeight: 800, color: '#ffbb88' }}>
+                    Повторите через {Math.floor(cooldown / 60)}:{String(cooldown % 60).padStart(2, '0')}
+                  </div>
+                )}
               </div>
             )}
 
-            <button type="submit" disabled={loading} style={{
-              background: loading ? 'var(--border)' : 'var(--green)',
+            <button type="submit" disabled={loading || cooldown > 0} style={{
+              background: loading || cooldown > 0 ? 'var(--border)' : 'var(--green)',
               color: '#fff', border: 'none', borderRadius: 4, padding: '12px',
-              fontSize: 15, fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer',
+              fontSize: 15, fontWeight: 800, cursor: loading || cooldown > 0 ? 'not-allowed' : 'pointer',
               letterSpacing: 1, fontFamily: "'Bebas Neue', Impact, sans-serif",
               marginTop: 4, transition: 'opacity 0.15s',
             }}>
-              {loading ? 'ЗАГРУЗКА...' : mode === 'signin' ? 'ВОЙТИ' : mode === 'signup' ? 'СОЗДАТЬ АККАУНТ' : 'ОТПРАВИТЬ ССЫЛКУ'}
+              {loading ? 'ЗАГРУЗКА...' : cooldown > 0 ? `ПОДОЖДИТЕ ${Math.floor(cooldown / 60)}:${String(cooldown % 60).padStart(2, '0')}` : mode === 'signin' ? 'ВОЙТИ' : mode === 'signup' ? 'СОЗДАТЬ АККАУНТ' : 'ОТПРАВИТЬ ССЫЛКУ'}
             </button>
 
             {mode === 'signin' && (
