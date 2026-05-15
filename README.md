@@ -27,8 +27,7 @@ next.js 15 / typescript / supabase (auth + db) / web audio api (all sounds synth
 git clone https://github.com/amirback/minesweeper
 cd minesweeper
 npm install
-cp .env.local.example .env.local
-# fill in your supabase keys
+# add NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, GROQ_API_KEY to .env.local
 npm run dev
 ```
 
