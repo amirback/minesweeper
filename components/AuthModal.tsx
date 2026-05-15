@@ -40,7 +40,7 @@ export function AuthModal({ onClose, onSignIn, onSignUp }: AuthModalProps) {
   }, []);
 
   const startCooldown = () => {
-    setCooldown(120);
+    setCooldown(30);
     cooldownRef.current = setInterval(() => {
       setCooldown(prev => {
         if (prev <= 1) { clearInterval(cooldownRef.current!); return 0; }
