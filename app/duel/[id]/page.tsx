@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { NavBar } from '@/components/NavBar';
+import { NavWithAuth } from '@/components/NavWithAuth';
 import {
   getMatch, joinMatch, submitMines, recordMatchTime, subscribeToMatch,
   getUserProfile,
@@ -349,7 +349,7 @@ export default function DuelPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <NavBar user={user} onSignOut={signOut} onOpenAuth={() => {}} />
+      <NavWithAuth user={user} onSignOut={signOut} />
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 16px 60px', gap: 20 }}>
         <div style={{ textAlign: 'center' }}>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { NavBar } from '@/components/NavBar';
+import { NavWithAuth } from '@/components/NavWithAuth';
 import { useAuth } from '@/hooks/useAuth';
 import { useLang } from '@/contexts/LanguageContext';
 import { LANG_LABELS, type Lang } from '@/lib/i18n';
@@ -86,7 +86,7 @@ export default function SettingsPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <NavBar user={user} onSignOut={signOut} onOpenAuth={() => {}} />
+      <NavWithAuth user={user} onSignOut={signOut} />
 
       <main style={{
         flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
