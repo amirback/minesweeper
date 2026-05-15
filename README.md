@@ -12,6 +12,7 @@ built this because i was tired of playing minesweeper like a caveman with no inf
 - **daily challenge** - same board for everyone every day. compare your time with the world
 - **leaderboard** - global ranking, see who's actually good at this
 - **paratrooper animation** - plant a flag and a soldier parachutes in. if it's a mine he dies. if not, he vibes
+- **ai assistant** - added an ai chat that analyzes your games and explains strategy. does a minesweeper game need an ai assistant? probably not. did i add one anyway to show i could? absolutely.
 
 ## tech
 
@@ -27,6 +28,14 @@ cp .env.local.example .env.local
 # fill in your supabase keys
 npm run dev
 ```
+
+## connect free ai (gemini)
+
+1. go to [aistudio.google.com](https://aistudio.google.com) → get api key (free, no credit card)
+2. add to vercel: project → settings → environment variables → `GEMINI_API_KEY` = your key
+3. redeploy → ai tab works
+
+free tier: 1500 requests/day, 15 req/min. more than enough.
 
 ## play it
 

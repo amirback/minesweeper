@@ -21,9 +21,10 @@ const SHORT: Record<string, Record<Lang, string>> = {
   '/profile':     { en: 'Profile', ru: 'Профиль', kz: 'Профиль' },
   '/friends':     { en: 'Friends', ru: 'Друзья',  kz: 'Достар' },
   '/settings':    { en: 'Set.',    ru: 'Настр.',  kz: 'Баптау' },
+  '/ai':          { en: '✦ AI',    ru: '✦ AI',    kz: '✦ AI' },
 };
 
-const BOTTOM_LINKS = ['/daily', '/leaderboard', '/stats', '/profile', '/friends', '/settings'];
+const BOTTOM_LINKS = ['/daily', '/leaderboard', '/stats', '/profile', '/friends', '/ai'];
 
 type NavBarProps = {
   user: User | null;
@@ -90,6 +91,18 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
           <Link href="/profile"     style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.profile ?? 'Profile'}</Link>
           <Link href="/friends"     style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.friends ?? 'Friends'}</Link>
           <Link href="/settings"    style={link} onMouseOver={e=>(e.currentTarget.style.color='var(--green-hi)')} onMouseOut={e=>(e.currentTarget.style.color='var(--text-2)')}>{tr.settings}</Link>
+          <Link href="/ai" style={{
+            background: pathname === '/ai' ? '#ef4444' : 'rgba(239,68,68,0.12)',
+            color: '#ef4444', fontSize: 12, fontWeight: 800,
+            padding: '4px 10px', borderRadius: 4,
+            display: 'flex', alignItems: 'center', gap: 4,
+            textDecoration: 'none', letterSpacing: 1,
+            border: '1px solid rgba(239,68,68,0.35)',
+            whiteSpace: 'nowrap',
+            ...(pathname === '/ai' ? { color: '#fff' } : {}),
+          }}>
+            ✦ AI
+          </Link>
         </div>
 
         {/* Right side */}
@@ -138,8 +151,8 @@ export function NavBar({ user, onSignOut, onOpenAuth, cloudElo }: NavBarProps) {
               flex: 1, display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
               textDecoration: 'none', gap: 0,
-              color: isActive ? 'var(--green-hi)' : 'var(--text-dim)',
-              borderTop: `2px solid ${isActive ? 'var(--green-hi)' : 'transparent'}`,
+              color: href === '/ai' ? '#ef4444' : isActive ? 'var(--green-hi)' : 'var(--text-dim)',
+              borderTop: `2px solid ${href === '/ai' && isActive ? '#ef4444' : isActive ? 'var(--green-hi)' : 'transparent'}`,
               fontSize: 10, fontWeight: isActive ? 800 : 600,
               letterSpacing: 0.2, lineHeight: 1.2,
               transition: 'color 0.12s',
