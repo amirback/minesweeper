@@ -12,8 +12,34 @@ import { NavBar } from '@/components/NavBar';
 import { AuthModal } from '@/components/AuthModal';
 import { getDailyDateString } from '@/lib/minesweeper';
 
-const DAILY_WON_AT_KEY = 'saper_daily_won_at';
-const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24 hours
+const DAILY_WON_AT_KEY  = 'saper_daily_won_at';
+const STREAK_KEY        = 'saper_daily_streak';
+const COOLDOWN_MS       = 24 * 60 * 60 * 1000;
+
+type StreakData = { count: number; lastDate: string };
+
+function loadStreak(): StreakData {
+  try {
+    return JSON.parse(localStorage.getItem(STREAK_KEY) ?? '') as StreakData;
+  } catch {
+    return { count: 0, lastDate: '' };
+  }
+}
+
+function updateStreak(today: string): number {
+  const s = loadStreak();
+  if (s.lastDate === today) return s.count; // already counted today
+
+  const yesterday = (() => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().slice(0, 10);
+  })();
+
+  const newCount = s.lastDate === yesterday ? s.count + 1 : 1;
+  localStorage.setItem(STREAK_KEY, JSON.stringify({ count: newCount, lastDate: today }));
+  return newCount;
+}
 
 function getSecondsLeft(wonAt: number) {
   return Math.max(0, Math.floor((wonAt + COOLDOWN_MS - Date.now()) / 1000));
@@ -36,11 +62,36 @@ function Countdown({ wonAt }: { wonAt: number }) {
   );
 }
 
+function StreakBadge({ count }: { count: number }) {
+  if (count < 1) return null;
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      background: count >= 7 ? 'rgba(239,68,68,0.12)' : 'rgba(245,158,11,0.1)',
+      border: `1px solid ${count >= 7 ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.35)'}`,
+      borderRadius: 20, padding: '4px 14px',
+    }}>
+      <span style={{ fontSize: 18 }}>🔥</span>
+      <span style={{
+        fontFamily: "'Bebas Neue', Impact, sans-serif",
+        fontSize: 20, letterSpacing: 1,
+        color: count >= 7 ? '#ef4444' : '#f59e0b',
+      }}>
+        {count}
+      </span>
+      <span style={{ fontSize: 12, color: 'var(--text-2)', fontWeight: 600 }}>
+        {count === 1 ? 'day' : 'days'}
+      </span>
+    </div>
+  );
+}
+
 export default function DailyPage() {
   const { user, signOut, signInWithEmail, signUpWithEmail } = useAuth();
-  const [authOpen, setAuthOpen] = useState(false);
-  const [wonAt, setWonAt] = useState<number | null>(null);
+  const [authOpen, setAuthOpen]       = useState(false);
+  const [wonAt, setWonAt]             = useState<number | null>(null);
   const [cooldownActive, setCooldownActive] = useState(false);
+  const [streak, setStreak]           = useState(0);
   const today = getDailyDateString();
 
   useEffect(() => {
@@ -49,6 +100,7 @@ export default function DailyPage() {
       setWonAt(stored);
       setCooldownActive(true);
     }
+    setStreak(loadStreak().count);
   }, []);
 
   const {
@@ -64,8 +116,10 @@ export default function DailyPage() {
       localStorage.setItem(DAILY_WON_AT_KEY, String(now));
       setWonAt(now);
       setCooldownActive(true);
+      const newStreak = updateStreak(today);
+      setStreak(newStreak);
     }
-  }, [status, dailyCompleted]);
+  }, [status, dailyCompleted, today]);
 
   const section: React.CSSProperties = {
     background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -78,22 +132,22 @@ export default function DailyPage() {
       <NavBar user={user} onSignOut={signOut} onOpenAuth={() => setAuthOpen(true)} />
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 16px 40px', gap: 20 }}>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
           <h1 style={{
             fontFamily: "'Bebas Neue', Impact, sans-serif",
             fontSize: 'clamp(28px, 7vw, 40px)', letterSpacing: 4,
             color: 'var(--text)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', gap: 10, marginBottom: 4,
+            justifyContent: 'center', gap: 10, marginBottom: 0,
           }}>
             Daily Challenge
           </h1>
-          <p style={{ color: 'var(--text-2)', fontSize: 13 }}>
+          <StreakBadge count={streak} />
+          <p style={{ color: 'var(--text-2)', fontSize: 13, margin: 0 }}>
             {today} · Одна карта для всех · Средняя сложность
           </p>
         </div>
 
         {cooldownActive && status !== 'won' && wonAt ? (
-          /* ── Cooldown locked ── */
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%' }}>
             <div style={section}>
               <h2 style={{
@@ -102,6 +156,11 @@ export default function DailyPage() {
               }}>
                 Уже сыграно!
               </h2>
+              {streak >= 2 && (
+                <p style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 12 }}>
+                  Серия: <strong style={{ color: '#f59e0b' }}>🔥 {streak} {streak === 1 ? 'день' : streak < 5 ? 'дня' : 'дней'} подряд</strong>. Не пропусти завтра!
+                </p>
+              )}
               <p style={{ color: 'var(--text-2)', fontSize: 14, marginBottom: 16 }}>
                 Следующая попытка через:
               </p>
@@ -126,7 +185,6 @@ export default function DailyPage() {
             </div>
           </div>
         ) : (
-          /* ── Game board ── */
           <>
             <div style={{ width: '100%', maxWidth: 700, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
               <GameHeader
