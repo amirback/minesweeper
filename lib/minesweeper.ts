@@ -103,6 +103,12 @@ export function createDailyBoard(rows: number, cols: number, mines: number, seed
       const sr = centerRow + dr, sc = centerCol + dc;
       if (sr >= 0 && sr < rows && sc >= 0 && sc < cols) safeZone.add(`${sr},${sc}`);
     }
+  // Find a seed where clicking center does NOT immediately win
+  for (let offset = 0; offset < 200; offset++) {
+    const board = _buildSeededBoard(rows, cols, mines, seed + offset, safeZone);
+    const afterClick = revealCell(board, centerRow, centerCol, rows, cols);
+    if (!checkWin(afterClick)) return board; // return unrevealed — first click handled in useGame
+  }
   return _buildSeededBoard(rows, cols, mines, seed, safeZone);
 }
 
