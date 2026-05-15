@@ -56,6 +56,14 @@ function saveStats(stats: LocalStats) {
   localStorage.setItem(STATS_KEY, JSON.stringify(stats));
 }
 
+function makeDailyBoard(): Board {
+  const { rows, cols, mines } = DIFFICULTY_CONFIG['medium'];
+  const board = createDailyBoard(rows, cols, mines, getDailySeed());
+  const centerRow = Math.floor(rows / 2);
+  const centerCol = Math.floor(cols / 2);
+  return revealCell(board, centerRow, centerCol, rows, cols);
+}
+
 type UseGameOptions = { mode?: 'normal' | 'daily'; userId?: string };
 
 export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGameOptions = {}) {
@@ -67,16 +75,15 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   );
 
   const initBoard = useCallback(() => {
-    if (mode === 'daily') {
-      const { rows, cols, mines } = DIFFICULTY_CONFIG[dailyDifficulty];
-      return createDailyBoard(rows, cols, mines, getDailySeed());
-    }
+    if (mode === 'daily') return makeDailyBoard();
     const { rows, cols } = DIFFICULTY_CONFIG[initialDifficulty];
     return createEmptyBoard(rows, cols);
   }, [mode, initialDifficulty]);
 
   const [board, setBoard]               = useState<Board>(initBoard);
-  const [status, setStatus]             = useState<GameStatus>('idle');
+  // Daily mode starts directly in 'playing' — board is already partially revealed.
+  // This eliminates the idle→playing race that caused instant-win on first click.
+  const [status, setStatus]             = useState<GameStatus>(mode === 'daily' ? 'playing' : 'idle');
   const [flagsPlaced, setFlagsPlaced]   = useState(0);
   const [flagsUsed, setFlagsUsed]       = useState(0);
   const [timer, setTimer]               = useState(0);
@@ -92,7 +99,6 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   const timerRef       = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastSafeClickRef = useRef<number>(0);
   const comboRef         = useRef(0);
-  const dailyFirstClickDoneRef = useRef(false);
 
   useEffect(() => {
     if (status === 'playing') {
@@ -130,9 +136,15 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
   const resetGame = useCallback((newDifficulty?: Difficulty) => {
     const diff = newDifficulty ?? difficulty;
     if (newDifficulty && mode !== 'daily') setDifficulty(newDifficulty);
-    const { rows, cols } = DIFFICULTY_CONFIG[diff];
-    setBoard(createEmptyBoard(rows, cols));
-    setStatus('idle');
+    if (mode === 'daily') {
+      setBoard(makeDailyBoard());
+      setStatus('playing');
+    } else {
+      const { rows, cols } = DIFFICULTY_CONFIG[diff];
+      setBoard(createEmptyBoard(rows, cols));
+      setStatus('idle');
+    }
+
     setFlagsPlaced(0);
     setFlagsUsed(0);
     setTimer(0);
@@ -141,7 +153,6 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
     startTimeRef.current = null;
     comboRef.current = 0;
     lastSafeClickRef.current = 0;
-    dailyFirstClickDoneRef.current = false;
     setProbabilities(new Map());
   }, [difficulty, mode]);
 
@@ -198,28 +209,15 @@ export function useGame(initialDifficulty: Difficulty = 'easy', options: UseGame
       let currentBoard = board;
 
       if (status === 'idle') {
-        if (mode === 'daily') {
-          if (dailyFirstClickDoneRef.current) return;
-          dailyFirstClickDoneRef.current = true;
+        // Normal mode only — daily mode starts as 'playing' with board pre-revealed
+        currentBoard = placeMines(board, rows, cols, mines, row, col);
+        setStatus('playing');
+        startTimeRef.current = Date.now();
+      }
 
-          const centerRow = Math.floor(rows / 2);
-          const centerCol = Math.floor(cols / 2);
-
-          currentBoard = revealCell(board, centerRow, centerCol, rows, cols);
-
-          setStatus('playing');
-          startTimeRef.current = Date.now();
-          if (checkWin(currentBoard)) {
-            setBoard(currentBoard); setStatus('won'); sounds.victory(); handleGameEnd(true, 0);
-            return;
-          }
-          setBoard(currentBoard);
-          return;
-        } else {
-          currentBoard = placeMines(board, rows, cols, mines, row, col);
-          setStatus('playing');
-          startTimeRef.current = Date.now();
-        }
+      // Daily mode: start timer on the user's first actual click
+      if (mode === 'daily' && !startTimeRef.current) {
+        startTimeRef.current = Date.now();
       }
 
       if (currentBoard[row][col].isRevealed) {
